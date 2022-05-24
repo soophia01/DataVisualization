@@ -24,6 +24,8 @@
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
+	
+	
   
   //Read the data
   d3.csv("All_Pokemon.csv").then( function(data) {
@@ -92,7 +94,7 @@
           .attr("r", 3)
           .style("fill", function (d) { if(d.Legendary=="1"){return "red"} return "white"})
           .style("stroke", "black")
-			.attr("class", "myDot")
+			.attr("class", "LegendaryDot")
       
       Line_att = svg.append('g')
 				.selectAll("dot")
@@ -117,48 +119,15 @@
 				
 			// A function that update the chart
 			function update(selectedGroup, outerR, innerR) {
-    
-				// Create new data with the selection?
-				const dataFilter = data.map(function(d){return {CatchRate:d.CatchRate , Experience: d.Experience } })
+
 
 				if(selectedGroup == "0"){
-					final();
+					hide_circle(0)
 				}else if (selectedGroup == "1"){
-					console.log(1)
-					notfinal();
+					hide_circle(1)
 				}else if(selectedGroup == "2"){
-					console.log(2)
-					all();
-				}
-
-				d3.selectAll("circle")
-            .transition()
-            .duration(1000)
-            .attr("cy", function(d) { return y(+d.Experience) })
-
-				Line_att
-					.transition()
-					.duration(1000)
-					.attr("x1", function (d) { return x(+d.CatchRate) - outerR; } )
-          .attr("x2", function (d) { return x(+d.CatchRate) + innerR } )
-          .attr("y1", function (d) { return y(+d.Experience); } )
-          .attr("y2", function (d) { return y(+d.Experience); } )
-          .style("stroke", "black")
-
-				Line_Def 
-					.transition()
-					.duration(1000)
-					.attr("x1", function (d) { return x(+d.CatchRate) + outerR; } )
-					.attr("x2", function (d) { return x(+d.CatchRate) + innerR } )
-					.attr("y1", function (d) { return y(+d.Experience); } )
-					.attr("y2", function (d) { return y(+d.Experience); } )
-					.style("stroke", "black")  
-
-				// Update the dot
-				svg.select(".myDot")
-					.transition()
-					.duration(1000)
-					
+					display_all();
+				}	
 			}
 
 			// When the button is changed, run the updateChart function
@@ -169,42 +138,41 @@
 				update(selectedOption, outerR, innerR)
 			})
 
-			// scale of line
-			function final(){
-				// Change the scale of the axis
-				y.domain([1200000,1400000]);
+			function hide_circle(num){
+				Line_att
+					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
 
-				// Update the axis
-				svg.select(".myAxis")
-					.transition()
-					.duration(1000)
-					.call(d3.axisLeft(y))
+				Line_Def
+					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
+
+				d3.selectAll(".myDot")
+					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
+					// .style("fill", function (d) { if(d.FinalEvolution==num){return "none"} })
+
+				svg.selectAll(".LegendaryDot")
+					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
+					.style("fill", function (d) { 
+						if(d.FinalEvolution != num && d.Legendary == 1){return "red"}
+						return "white"
+						})
 			}
 
-			function notfinal(){
-				// Change the scale of the axis
-				y.domain([1200000,1400000]);
+			function display_all(){
+				Line_att
+					.style("stroke",  "black")
 
-				// Update the axis
-				svg.select(".myAxis")
-					.transition()
-					.duration(1000)
-					.call(d3.axisLeft(y))
+				Line_Def
+					.style("stroke", "black")
 
-			}
+				d3.selectAll("circle")
+					.style("stroke", "black")
 
-			function all(){
-				// Change the scale of the axis
-				y.domain(
-						[0,d3.max(data.map(function(d) { return d.Experience; }))	]
-				)
-
-				// Update the axis
-				svg.select(".myAxis")
-					.transition()
-					.duration(1000)
-					.call(d3.axisLeft(y))
-
+				svg.selectAll(".LegendaryDot")
+					.style("stroke", "black")
+					.style("fill", function (d) { 
+						if( d.Legendary == 1){return "red"}
+						return "white"
+						})
 			}
 
 
