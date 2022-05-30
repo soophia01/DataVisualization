@@ -35,9 +35,9 @@
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
   
   //Read the data
-  d3.csv("All_Pokemon2.csv").then( function(data) {
-      const outerR = 10;
-      const innerR = 3;
+  d3.csv("All_Pokemon4.csv").then( function(data) {
+      //// const outerR = 10;
+      //// const innerR = 3;
       const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
       const attr = ['Grass', 'Fighting', 'Bug', 'Poison', 'Water', 'Ghost', 'Fire',
        'Ground', 'Normal', 'Rock', 'Ice', 'Psychic', 'Electric', 'Dark',
@@ -117,8 +117,8 @@
         .join("circle")
             .attr("cx", function (d) { return x(d.CatchRate); } )
             .attr("cy", function (d) { return y(d.Experience); } )
-            .attr("r", 10)
-            //// .attr("r", function (d) { return (d.outterR); } )
+            ////.attr("r", 10)
+            .attr("r", function (d) { return x(d.outterR); } )
             .style("fill", "none")
             .style("stroke", "black")
         .attr("class", "myDot")
@@ -128,11 +128,11 @@
         .selectAll("dot")
         .data(data)
         .join("circle")
-            .attr("cx", function (d) { return x(d.CatchRate);} )
-            //// .attr("cx", function (d) { return x(d.innerX);} )
+            ////.attr("cx", function (d) { return x(d.CatchRate);} )
+            .attr("cx", function (d) { return x(d.innerX);} )
             .attr("cy", function (d) { return y(d.Experience); } )
-            .attr("r", 3)
-            //// .attr("r", function (d) { return (d.innerR); } )
+            ////// .attr("r", 3)
+            .attr("r", function (d) { return x(d.innerR); } )
             .style("fill", function (d) { if(d.Legendary=="1"){return "red"} return "white"})
             .style("stroke", "black")
         .attr("class", "LegendaryDot")
@@ -143,10 +143,10 @@
 				.data(data)
 				.join("line")
             .attr("class", "attack")
-						.attr("x1", function (d) { return x(d.CatchRate)-outerR; } )
-            //// .attr("x1", function (d) { return (d.leftX1); } )
-						.attr("x2", function (d) { return x(d.CatchRate)-innerR } )
-            //// .attr("x2", function (d) { return (d.leftX2) } )
+						////.attr("x1", function (d) { return x(d.CatchRate)-outerR; } )
+            .attr("x1", function (d) { return x(d.leftX1); } )
+						////.attr("x2", function (d) { return x(d.CatchRate)-innerR } )
+            .attr("x2", function (d) { return x(d.leftX2) } )
 						.attr("y1", function (d) { return y(d.Experience); } )
 						.attr("y2", function (d) { return y(d.Experience); } )
 						.style("stroke", "black")
@@ -157,10 +157,10 @@
       .data(data)
       .join("line")
         .attr("class", "defense")
-        .attr("x1", function (d) { return x(d.CatchRate)+innerR; } )
-        //// .attr("x1", function (d) { return (d.rightX1) } )
-        .attr("x2", function (d) { return x(d.CatchRate)+outerR } )
-        //// .attr("x2", function (d) { return (d.rightX2) } )
+        ////.attr("x1", function (d) { return x(d.CatchRate)+innerR; } )
+        .attr("x1", function (d) { return x(d.rightX1) } )
+        ////.attr("x2", function (d) { return x(d.CatchRate)+outerR } )
+        .attr("x2", function (d) { return x(d.rightX2) } )
         .attr("y1", function (d) { return y(d.Experience); } )
         .attr("y2", function (d) { return y(d.Experience); } )
         .style("stroke", "black")
