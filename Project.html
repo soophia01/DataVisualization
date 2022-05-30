@@ -7,6 +7,9 @@
 <!-- Initialize a select button -->
 <select id="selectButton"></select>
 
+<!-- select attr -->
+<select id="attrselect"></select>
+
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
 
@@ -36,10 +39,12 @@
       const outerR = 10;
       const innerR = 3;
       const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
+      const attr = ['Grass', 'Fighting', 'Bug', 'Poison', 'Water', 'Ghost', 'Fire',
+       'Ground', 'Normal', 'Rock', 'Ice', 'Psychic', 'Electric', 'Dark',
+       'Dragon', 'Steel', 'Flying', 'Fairy']
 			const keys = allGroup.keys()
 
 			// add the options to the button
-			// 還沒調整好
 			d3.select("#selectButton")
 				.selectAll('myOptions')
 				.data(allGroup)
@@ -48,6 +53,14 @@
 				.text(function (d) { return d; }) // text showed in the menu
 				.data(keys)
 				.attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+      d3.select("#attrselect")
+        .selectAll('myOptions')
+        .data(attr)
+          .enter()
+          .append('option')
+        .text(function (d) { return d; }) // text showed in the menu
+        .attr("value", function (d) { return d; }) // corresponding value returned by the button
 
       // Add X axis
       const x = d3.scaleLinear()
@@ -188,57 +201,67 @@
         .call(zoom);
 				
 			// A function that update the chart
-			function update(selectedGroup, outerR, innerR) {
+			function update(selectedGroup, attr) {
 				if(selectedGroup == "0"){
-					hide_circle(0)
+					hide_circle(0, attr)
 				}else if (selectedGroup == "1"){
-					hide_circle(1)
+					hide_circle(1, attr)
 				}else if(selectedGroup == "2"){
-					display_all();
+					display_all(attr);
 				}	
-			}
+      }
 
 			// When the button is changed, run the updateChart function
 			d3.select("#selectButton").on("change", function(event,d) {
 				// recover the option that has been chosen
+        const selectedattr = d3.select("#attrselect").property("value")
 				const selectedOption = d3.select(this).property("value")
-				// // run the updateChart function with this selected option
-				update(selectedOption, outerR, innerR)
+        // run the updateChart function with this selected option
+        update(selectedOption, selectedattr)
 			})
 
-			function hide_circle(num){
+      d3.select("#attrselect").on("change", function(event,d) {
+				// recover the option that has been chosen
+				const selectedOption = d3.select("#selectButton").property("value")
+        const selectedattr = d3.select(this).property("value")
+        // run the updateChart function with this selected option
+        update(selectedOption, selectedattr)
+        
+			})
+
+			function hide_circle(num, attr){
 				Line_att
-					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
+					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 
 				Line_Def
-					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
+					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 
 				d3.selectAll(".myDot")
-					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
+					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 					// .style("fill", function (d) { if(d.FinalEvolution==num){return "none"} })
 
 				svg.selectAll(".LegendaryDot")
-					.style("stroke", function (d) { if(d.FinalEvolution==num){return "none"} return "black"})
+					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 					.style("fill", function (d) { 
-						if(d.FinalEvolution != num && d.Legendary == 1){return "red"}
+						if(d.FinalEvolution != num && d.Legendary == 1 && (d.Type1==attr || d.Type2==attr)){return "red"}
 						return "white"
 						})
 			}
 
-			function display_all(){
+			function display_all(attr){
 				Line_att
-					.style("stroke",  "black")
+					.style("stroke",  function (d) { if(d.Type1==attr || d.Type2==attr){return "black"} return "none"})
 
 				Line_Def
-					.style("stroke", "black")
+					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr){return "black"} return "none"})
 
 				d3.selectAll("circle")
-					.style("stroke", "black")
+					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr){return "black"} return "none"})
 
 				svg.selectAll(".LegendaryDot")
-					.style("stroke", "black")
+					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr){return "black"} return "none"})
 					.style("fill", function (d) { 
-						if( d.Legendary == 1){return "red"}
+						if( d.Legendary == 1 && (d.Type1==attr || d.Type2==attr)){return "red"}
 						return "white"
 						})
 			}
