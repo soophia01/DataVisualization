@@ -1,0 +1,25 @@
+ ref1: https://i.redd.it/lcv5957a0tw71.jpg
+ ref2: https://pic.pimg.tw/abset/1507457417-1536193862_n.png
+ 
+ Type1
+ Bug: #89a80d
+ Dark: #5e4131D
+ Dragon: #5026baD
+ Electric: #ffd137D
+ Fairy: #ff7f9d
+ Fighting: #e54340D
+ Fire: #fc5b15D
+ Flying: #a176f3D
+ Ghost: #5c4385D 
+ Grass: #D21c64e
+ Ground: #ebae5d  
+ Ice: #77dbd9D
+ Normal: #a7ac6a
+ Poison: #b552a2
+ Psychic: #fc5478
+ Rock: #ab8e18D
+ Steel: #a5a4c3
+ Water: #5181f9
+
+
+ 
