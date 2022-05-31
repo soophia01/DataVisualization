@@ -152,15 +152,17 @@
           .append("stop")
           .attr("offset", "0.5")
           .attr("stop-opacity", "0.7")
+          .attr("class", function(d){if(d.Type2 == ''){return "none"}return d.Type2})
           .style("stop-color",  function (d) {  
+            if(d.Type2 == ''){
+              return d3.color("#FFFFFF")
+            }
             for(let i = 0 ; i < color.length ; i++){
               if(color[i].type == d.Type2){
                 return d3.color(color[i].color)
-              }else{
-                let color = "#FFFFFF"
               }
             }
-            return d3.color(color)
+            
           });
           
       // upper part of the circle
@@ -168,19 +170,19 @@
         .selectAll(".circleColor")
         .data(data)
         .append("stop")
+        .attr("class", function(d){return d.Type1})
         .attr("offset", "50%")
         .attr("stop-opacity", "0.7")
         // console.log( data.map(function(d) { return d.Type1}))
         .style("stop-color",  function (d) { 
           for(let i = 0 ; i < color.length ; i++){
+              if(d.Type1 == ''){
+                return d3.color("#FFFFFF")
+              }
               if(color[i].type == d.Type1){
                 return color[i].color
               }
-              else{
-                let color = "#FFFFFF"
-              }
             }
-            return d3.color(color)
         })
             
 
@@ -209,7 +211,8 @@
           .attr("cx", function (d) { return x(d.innerX);} )
           .attr("cy", function (d) { return y(d.Experience); } )
           .attr("r", function (d) { return x(d.innerR); } )
-          .style("fill", function (d) { if(d.Legendary=="1"){return "red"} return "none"})
+          .attr("opacity", "0.5")
+          .style("fill", function (d) { if(d.Legendary=="1"){return "red"} return "white"})
           .style("stroke", "black")
 
       // left line      
@@ -327,7 +330,7 @@
 				Line_Def
 					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 
-        // d3.selectAll(".circleColor stop").attr("stop-opacity", 0)
+        d3.selectAll(".circleColor stop").attr("stop-opacity", 0)
 				d3.selectAll(".myDot")
 					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 					// .style("fill", function (d) { if(d.FinalEvolution==num){return "none"} })
@@ -336,6 +339,7 @@
 					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 					.style("fill", function (d) { 
 						if(d.FinalEvolution != num && d.Legendary == 1 && (d.Type1==attr || d.Type2==attr)){return "red"}
+            else if(d.FinalEvolution != num && d.Legendary != 1 && (d.Type1==attr || d.Type2==attr)){return "white"}
 						return "none"
 						})
 			}
@@ -354,6 +358,7 @@
 					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr){return "black"} return "none"})
 					.style("fill", function (d) { 
 						if( d.Legendary == 1 && (d.Type1==attr || d.Type2==attr)){return "red"}
+            else if ( d.Legendary == 0 && (d.Type1==attr || d.Type2==attr)){return "white"}
 						return "none"
 						})
 			}
