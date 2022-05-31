@@ -4,6 +4,8 @@
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
 
+
+
 <!-- Initialize a select button -->
 <select id="selectButton"></select>
 
@@ -36,8 +38,6 @@
   
   //Read the data
   d3.csv("All_Pokemon4.csv").then( function(data) {
-      //// const outerR = 10;
-      //// const innerR = 3;
       const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
       const attr = ['Grass', 'Fighting', 'Bug', 'Poison', 'Water', 'Ghost', 'Fire',
        'Ground', 'Normal', 'Rock', 'Ice', 'Psychic', 'Electric', 'Dark',
@@ -112,103 +112,144 @@
       // Add dots
       // 有bug
       // color of the circle
-      // var circleColor = svg.append("defs")
-      //   .append("linearGradient")
-      //       .attr("id", "circleColor")
-      //       .attr("x1", "0%")
-      //       .attr("x2", "0%")
-      //       .attr("y1", "100%")
-      //       .attr("y2", "0%");
-      // // lower part of the circle
-      // circleColor
-      //     .data(data)
-      //     .append("stop")
-      //     .attr("offset", "50%")
-      //     .style("stop-color", function (d) { if(d.Type2=="Bug"){
-      //                                           return "#89a80d"
-      //                                         } else if(d.Type2=="Dark"){
-      //                                           return "#5e4131D"
-      //                                         } else if(d.Type2=="Dragon"){
-      //                                           return "#5026baD"
-      //                                         } else if(d.Type2=="Electric"){
-      //                                           return "#ffd137D"
-      //                                         } else if(d.Type2=="Fairy"){
-      //                                           return "#ff7f9d"
-      //                                         } else if(d.Type2=="Fighting"){
-      //                                           return "#e54340D"
-      //                                         } else if(d.Type2=="Fire"){
-      //                                           return "#fc5b15D"
-      //                                         } else if(d.Type2=="Flying"){
-      //                                           return "#a176f3D"
-      //                                         } else if(d.Type2=="Ghost"){
-      //                                           return "#5c4385D"
-      //                                         } else if(d.Type2=="Grass"){
-      //                                           return "#D21c64e"
-      //                                         } else if(d.Type2=="Ground"){
-      //                                           return "#ebae5d"
-      //                                         } else if(d.Type2=="Ice"){
-      //                                           return "#77dbd9D"
-      //                                         } else if(d.Type2=="Normal"){
-      //                                           return "#a7ac6a"
-      //                                         } else if(d.Type2=="Poison"){
-      //                                           return "#b552a2"
-      //                                         } else if(d.Type2=="Psychic"){
-      //                                           return "#fc5478"
-      //                                         } else if(d.Type2=="Rock"){
-      //                                           return "#ab8e18D"
-      //                                         } else if(d.Type2=="Steel"){
-      //                                           return "#a5a4c3"
-      //                                         } else if(d.Type2=="Water"){
-      //                                           return "#5181f9"
-      //                                         } else{
-      //                                           return "white";
-      //                                         }
-      //                                       });
-      // // upper part of the circle
-      // circleColor
-      //     .data(data)
-      //     .append("stop")
-      //     .attr("offset", "50%")
-      //     .style("stop-color",  function (d) { if(d.Type1=="Bug"){
-      //                                           return "#89a80d"
-      //                                         } else if(d.Type1=="Dark"){
-      //                                           return "#5e4131D"
-      //                                         } else if(d.Type1=="Dragon"){
-      //                                           return "#5026baD"
-      //                                         } else if(d.Type1=="Electric"){
-      //                                           return "#ffd137D"
-      //                                         } else if(d.Type1=="Fairy"){
-      //                                           return "#ff7f9d"
-      //                                         } else if(d.Type1=="Fighting"){
-      //                                           return "#e54340D"
-      //                                         } else if(d.Type1=="Fire"){
-      //                                           return "#fc5b15D"
-      //                                         } else if(d.Type1=="Flying"){
-      //                                           return "#a176f3D"
-      //                                         } else if(d.Type1=="Ghost"){
-      //                                           return "#5c4385D"
-      //                                         } else if(d.Type1=="Grass"){
-      //                                           return "#D21c64e"
-      //                                         } else if(d.Type1=="Ground"){
-      //                                           return "#ebae5d"
-      //                                         } else if(d.Type1=="Ice"){
-      //                                           return "#77dbd9D"
-      //                                         } else if(d.Type1=="Normal"){
-      //                                           return "#a7ac6a"
-      //                                         } else if(d.Type1=="Poison"){
-      //                                           return "#b552a2"
-      //                                         } else if(d.Type1=="Psychic"){
-      //                                           return "#fc5478"
-      //                                         } else if(d.Type1=="Rock"){
-      //                                           return "#ab8e18D"
-      //                                         } else if(d.Type1=="Steel"){
-      //                                           return "#a5a4c3"
-      //                                         } else if(d.Type1=="Water"){
-      //                                           return "#5181f9"
-      //                                         } else{
-      //                                           return "white";
-      //                                         }
-      //                                       });
+      var circleColor = svg.append("defs")
+        .append("linearGradient")
+            .attr("id", "circleColor")
+            .attr("x1", "0%")
+            .attr("x2", "0%")
+            .attr("y1", "100%")
+            .attr("y2", "0%");
+      
+      // lower part of the circle
+      circleColor
+          .data(data)
+          .append("stop")
+          .attr("offset", "0.5")
+          .attr("stop-opacity", "0.7")
+          .style("stop-color",  function (d) { if(d.Type2=="Bug"){
+                                                return d3.color("#89a80d")
+                                              } 
+                                              else if(d.Type2=="Dark"){
+                                                return d3.color("#5e4131")
+                                              } 
+                                              else if(d.Type2=="Dragon"){
+                                                return d3.color("#5026ba")
+                                              } 
+                                              else if(d.Type2=="Electric"){
+                                                return d3.color("#ffd137")
+                                              } 
+                                              else if(d.Type2=="Fairy"){
+                                                return d3.color("#ff7f9d")
+                                              } 
+                                              else if(d.Type2=="Fighting"){
+                                                return d3.color("#e54340")
+                                              } 
+                                              else if(d.Type2=="Fire"){
+                                                return d3.color("#fc5b15")
+                                              } 
+                                              else if(d.Type2=="Flying"){
+                                                return d3.color("#a176f3")
+                                              } 
+                                              else if(d.Type2=="Ghost"){
+                                                return d3.color("#5c4385")
+                                              } 
+                                              else if(d.Type2=="Grass"){
+                                                return d3.color("#21c64e")
+                                              } 
+                                              else if(d.Type2=="Ground"){
+                                                return d3.color("#ebae5d")
+                                              } 
+                                              else if(d.Type2=="Ice"){
+                                                return d3.color("#77dbd9")
+                                              } 
+                                              else if(d.Type2=="Normal"){
+                                                return d3.color("#a7ac6a")
+                                              } 
+                                              else if(d.Type2=="Poison"){
+                                                return d3.color("#b552a2")
+                                              } 
+                                              else if(d.Type2=="Psychic"){
+                                                return d3.color("#fc5478")
+                                              } 
+                                              else if(d.Type2=="Rock"){
+                                                return d3.color("#ab8e18")
+                                              } 
+                                              else if(d.Type2=="Steel"){
+                                                return d3.color("#a5a4c3")
+                                              } 
+                                              else if(d.Type2=="Water"){
+                                                return d3.color("#5181f9")
+                                              } 
+                                              else{
+                                                return d3.color("#FFFFFF");
+                                              }
+                                            });
+      // upper part of the circle
+      circleColor
+          .data(data)
+          .append("stop")
+          .attr("offset", "50%")
+          .attr("stop-opacity", "0.7")
+          // console.log( data.map(function(d) { return d.Type1}))
+          .style("stop-color",  function (d) { if(d.Type1=="Bug"){
+                                                return d3.color("#89a80d")
+                                              } 
+                                              else if(d.Type1=="Dark"){
+                                                return d3.color("#5e4131")
+                                              } 
+                                              else if(d.Type1=="Dragon"){
+                                                return d3.color("#5026ba")
+                                              } 
+                                              else if(d.Type1=="Electric"){
+                                                return d3.color("#ffd137")
+                                              } 
+                                              else if(d.Type1=="Fairy"){
+                                                return d3.color("#ff7f9d")
+                                              } 
+                                              else if(d.Type1=="Fighting"){
+                                                return d3.color("#e54340")
+                                              } 
+                                              else if(d.Type1=="Fire"){
+                                                return d3.color("#fc5b15")
+                                              } 
+                                              else if(d.Type1=="Flying"){
+                                                return d3.color("#a176f3")
+                                              } 
+                                              else if(d.Type1=="Ghost"){
+                                                return d3.color("#5c4385")
+                                              } 
+                                              else if(d.Type1=="Grass"){
+                                                return d3.color("#21c64e")
+                                              } 
+                                              else if(d.Type1=="Ground"){
+                                                return d3.color("#ebae5d")
+                                              } 
+                                              else if(d.Type1=="Ice"){
+                                                return d3.color("#77dbd9")
+                                              } 
+                                              else if(d.Type1=="Normal"){
+                                                return d3.color("#a7ac6a")
+                                              } 
+                                              else if(d.Type1=="Poison"){
+                                                return d3.color("#b552a2")
+                                              } 
+                                              else if(d.Type1=="Psychic"){
+                                                return d3.color("#fc5478")
+                                              } 
+                                              else if(d.Type1=="Rock"){
+                                                return d3.color("#ab8e18")
+                                              } 
+                                              else if(d.Type1=="Steel"){
+                                                return d3.color("#a5a4c3")
+                                              } 
+                                              else if(d.Type1=="Water"){
+                                                return d3.color("#5181f9")
+                                              } 
+                                              else{
+                                                return d3.color("#FFFFFF");
+                                              }
+                                            })
+            
 
       // outer circle
       scatter
@@ -216,16 +257,12 @@
         .data(data)
         .join("circle")
           .attr("class", "myDot outterCircle")
-          // .attr("class", "outterCircle")
           .attr("cx", function (d) { return x(d.CatchRate); } )
           .attr("cy", function (d) { return y(d.Experience); } )
-          ////.attr("r", 10)
           .attr("r", function (d) { return x(d.outterR); } )
           .style("stroke", "black")
-          // .style("fill", "none")
           .style("fill", "transparent")
-        // .attr("class", "myDot outterCircle")
-
+          .style("fill", "url(#circleColor)");
         
       
       // inner circle          
@@ -234,25 +271,19 @@
         .data(data)
         .join("circle")
           .attr("class", "LegendaryDot innerCircle")
-          // .attr("class", "innerCircle")
-          ////.attr("cx", function (d) { return x(d.CatchRate);} )
           .attr("cx", function (d) { return x(d.innerX);} )
           .attr("cy", function (d) { return y(d.Experience); } )
-          ////// .attr("r", 3)
           .attr("r", function (d) { return x(d.innerR); } )
           .style("fill", function (d) { if(d.Legendary=="1"){return "red"} return "none"})
           .style("stroke", "black")
-        // .attr("class", "LegendaryDot", "innerCircle")
-      
+
       // left line      
       Line_att = scatter
 				.selectAll("dot")
 				.data(data)
 				.join("line")
             .attr("class", "attack")
-						////.attr("x1", function (d) { return x(d.CatchRate)-outerR; } )
             .attr("x1", function (d) { return x(d.leftX1); } )
-						////.attr("x2", function (d) { return x(d.CatchRate)-innerR } )
             .attr("x2", function (d) { return x(d.leftX2) } )
 						.attr("y1", function (d) { return y(d.Experience); } )
 						.attr("y2", function (d) { return y(d.Experience); } )
@@ -264,9 +295,7 @@
       .data(data)
       .join("line")
         .attr("class", "defense")
-        ////.attr("x1", function (d) { return x(d.CatchRate)+innerR; } )
         .attr("x1", function (d) { return x(d.rightX1) } )
-        ////.attr("x2", function (d) { return x(d.CatchRate)+outerR } )
         .attr("x2", function (d) { return x(d.rightX2) } )
         .attr("y1", function (d) { return y(d.Experience); } )
         .attr("y2", function (d) { return y(d.Experience); } )
@@ -288,18 +317,18 @@
 
           // update circle position
           //// 因為inner 跟 outter circle的圓心點不一樣，所以要分開寫
-          
           scatter
             .selectAll(".outterCircle")
             .attr('cx', function(d) {return newX(d.CatchRate)})
             .attr('cy', function(d) {return newY(d.Experience)})
-
+            // .attr("r", function (d) { return newX(d.outterR); } )
+          
           scatter
             .selectAll(".innerCircle")
             .attr("cx", function (d) { return newX(d.innerX);} )
             .attr("cy", function (d) { return newY(d.Experience); } )
+            // .attr("r", function (d) { return newX(d.innerR); } )
 
-          
           scatter
             .selectAll(".attack")
             .attr("x1", function (d) { return newX(d.leftX1); } )
@@ -347,7 +376,7 @@
         update(selectedOption, selectedattr)
 			})
 
-      d3.select("#attrselect").on("change", function(event,d) {
+      d3.select("#attrselect").on("change", function(event, d) {
 				// recover the option that has been chosen
 				const selectedOption = d3.select("#selectButton").property("value")
         const selectedattr = d3.select(this).property("value")
