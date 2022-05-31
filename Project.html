@@ -370,7 +370,7 @@
 					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr)){return "black"} return "none"})
 					.style("fill", function (d) { 
 						if(d.FinalEvolution != num && d.Legendary == 1 && (d.Type1==attr || d.Type2==attr)){return "red"}
-						return "white"
+						return "none"
 						})
 			}
 
@@ -388,7 +388,7 @@
 					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr){return "black"} return "none"})
 					.style("fill", function (d) { 
 						if( d.Legendary == 1 && (d.Type1==attr || d.Type2==attr)){return "red"}
-						return "white"
+						return "none"
 						})
 			}
 
