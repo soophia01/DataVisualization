@@ -1,19 +1,50 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 
+<style>
+  #colorPalette{
+    float: left;
+    display: inline;
+  }
+  #my_dataviz{
+    float: left;
+    display: inline;
+  }
+</style>
+
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
-
-
-
 <!-- Initialize a select button -->
+<label for="selectButton">please choose Final Evolution or not</label>
 <select id="selectButton"></select>
-
+<br>
 <!-- select attr -->
+<label for="attrselect">please choose the Type</label>
 <select id="attrselect"></select>
+<br>
+
+<!-- x, y 軸還要再修QQQQ -->
+<label for="Xaxis_change">please choose the Xaxis(努力中)</label>
+<select id="Xaxis_change">
+  <option value="BMI">BMI</option>
+  <option value="Height">Height</option>
+  <option value="Weight">Weight</option>
+  <option value="Experience">Experience to level 100</option>
+  <option value="CatchRate">CatchRate</option>
+</select>
+<br>
+<label for="Yaxis_change">please choose the Yaxis(努力中)</label>
+<select id="Yaxis_change">
+  <option value="BMI">BMI</option>
+  <option value="Height">Height</option>
+  <option value="Weight">Weight</option>
+  <option value="Experience">Experience to level 100</option>
+  <option value="CatchRate">CatchRate</option>
+</select>
 
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz"></div>
+<div id="colorPalette"></div>
 
 <script>
 
@@ -21,6 +52,9 @@
   const margin = {top: 10, right: 30, bottom: 30, left: 100},
           width = 1200 - margin.left - margin.right,
           height = 850 - margin.top - margin.bottom;
+  const margin2 = {top: 10, right: 30, bottom: 30, left: 100},
+          width2 = 110 - margin.left - margin.right,
+          height2 = 850 - margin.top - margin.bottom;
 
   // const zoom = d3.zoom()
   //   .on('zoom', (event) => {
@@ -36,6 +70,13 @@
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
   
+  // color palette
+  const svg2 = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width2 + margin2.left + margin2.right)
+    .attr("height", height2 + margin2.top + margin2.bottom)
+  .append("g");
+  
   //Read the data
   d3.csv("All_Pokemon4.csv").then( function(data) {
       const allGroup = ["ALL", "Final Evolution", "NOT Final Evoulution"]
@@ -46,23 +87,26 @@
       const color =[
         {"type":"Bug", "color":"#89a80d"},
         {"type":"Dark", "color":"#5e4131D"},
-        {"type":"Dragon", "color":"#5026baD"},
-        {"type":"Electric", "color":"#ffd137D"},
+        {"type":"Dragon", "color":"#FF4D00"},
+        {"type":"Electric", "color":"#006374"},
         {"type":"Fairy", "color":"#ff7f9d"},
-        {"type":"Fighting", "color":"#e54340D"},
-        {"type":"Fire", "color":"#fc5b15D"},
-        {"type":"Flying", "color":"#a176f3D"},
-        {"type":"Ghost", "color":"#5c4385D"},
+        {"type":"Fighting", "color":"#32CD32"},
+        {"type":"Fire", "color":"#FF2400"},
+        {"type":"Flying", "color":"#30D5C8"},
+        {"type":"Ghost", "color":"#808080"},
         {"type":"Grass", "color":"#385E0F"},
         {"type":"Ground", "color":"#ebae5d"},
-        {"type":"Ice", "color":"#77dbd9D"},
+        {"type":"Ice", "color":"#6495ED"},
         {"type":"Normal", "color":"#a7ac6a"},
         {"type":"Poison", "color":"#b552a2"},
         {"type":"Psychic", "color":"#fc5478"},
-        {"type":"Rock", "color":"#ab8e18D"},
+        {"type":"Rock", "color":"#4D1F00"},
         {"type":"Steel", "color":"#a5a4c3"},
         {"type":"Water", "color":"#5181f9"}
       ]
+
+      var x_attr = "CatchRate"
+      var y_attr = "Experience"
 
 			// add the options to the button
 			d3.select("#selectButton")
@@ -87,11 +131,13 @@
         .domain([0, 260])
         .range([ 0, width ]);
       var xAxis = svg.append("g")
+        .attr("class", "myAxis_x")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x));
 
       // text label for the x axis
-  		svg.append("text")             
+  		svg.append("text")
+        .attr("id", "Xaxis")             
       	.attr("transform",
             "translate(" + (width/2) + " ," + 
                            (height + margin.top + 20) + ")")
@@ -108,6 +154,7 @@
 
 			// text label for the y axis
   		svg.append("text")
+        .attr("id", "Yaxis")  
       	.attr("transform", "rotate(-90)")
       	.attr("y", 0 - margin.left)
       	.attr("x",0 - (height / 2))
@@ -130,7 +177,6 @@
         .attr("clip-path", "url(#clip)")
       
       // Add dots
-      // 有bug
       // color of the circle
       data.map(function(d){
          svg
@@ -254,29 +300,29 @@
           //// 因為inner 跟 outter circle的圓心點不一樣，所以要分開寫
           scatter
             .selectAll(".outterCircle")
-            .attr('cx', function(d) {return newX(d.CatchRate)})
-            .attr('cy', function(d) {return newY(d.Experience)})
+            .attr('cx', function(d) {return newX(d[x_attr])})
+            .attr('cy', function(d) {return newY(d[y_attr])})
             // .attr("r", function (d) { return newX(d.outterR); } )
           
           scatter
             .selectAll(".innerCircle")
             .attr("cx", function (d) { return newX(d.innerX);} )
-            .attr("cy", function (d) { return newY(d.Experience); } )
+            .attr("cy", function (d) { return newY(d[y_attr]); } )
             // .attr("r", function (d) { return newX(d.innerR); } )
 
           scatter
             .selectAll(".attack")
             .attr("x1", function (d) { return newX(d.leftX1); } )
             .attr("x2", function (d) { return newX(d.leftX2); } )
-            .attr("y1", function (d) { return newY(d.Experience); } )
-            .attr("y2", function (d) { return newY(d.Experience); } )
+            .attr("y1", function (d) { return newY(d[y_attr]); } )
+            .attr("y2", function (d) { return newY(d[y_attr]); } )
 
           scatter
             .selectAll(".defense")
 						.attr("x1", function (d) { return newX(d.rightX1); } )
 						.attr("x2", function (d) { return newX(d.rightX2) } )
-						.attr("y1", function (d) { return newY(d.Experience); } )
-						.attr("y2", function (d) { return newY(d.Experience); } )
+						.attr("y1", function (d) { return newY(d[y_attr]); } )
+						.attr("y2", function (d) { return newY(d[y_attr]); } )
 
         });
 
@@ -317,7 +363,77 @@
         const selectedattr = d3.select(this).property("value")
         // run the updateChart function with this selected option
         update(selectedOption, selectedattr)
+			})
+
+      d3.select("#Xaxis_change").on("change", function(event, d) {
+				// recover the option that has been chosen
+				x_attr = d3.select("#Xaxis_change").property("value")
+
+        d3.select("#Xaxis").text(x_attr)
+
+        x.domain( [0, d3.max(data.map(function(d) { return d[x_attr]; }))] )
+
+        svg.select(".myAxis_x")
+          .transition()
+          .duration(1000)
+          .call(d3.axisBottom(x))
+
+        scatter
+          .selectAll(".outterCircle")
+          .attr('cx', function(d) {return x(d[x_attr])})
+
+        scatter
+          .selectAll(".innerCircle")
+          // .attr("cx", function (d) { return x(d.innerX);} )
+          .attr("cx", function (d) { return x(d[x_attr]);} )
         
+        scatter
+          .selectAll(".attack")
+          .attr("y1", function (d) { return y(d[x_attr]); } )
+          .attr("y2", function (d) { return y(d[x_attr]); } )
+          .style("stroke", "none")
+
+        scatter
+          .selectAll(".defense")
+          .attr("y1", function (d) { return y(d[x_attr]); } )
+          .attr("y2", function (d) { return y(d[x_attr]); } )
+          .style("stroke", "none")
+        
+			})
+
+      d3.select("#Yaxis_change").on("change", function(event, d) {
+				// recover the option that has been chosen
+				y_attr = d3.select("#Yaxis_change").property("value")
+
+        y.domain( [0, d3.max(data.map(function(d) { return d[y_attr]; }))] )
+
+        svg.select(".myAxis")
+          .transition()
+          .duration(1000)
+          .call(d3.axisLeft(y))
+
+        d3.select("#Yaxis").text(y_attr)
+        scatter
+          .selectAll(".outterCircle")
+          .attr('cy', function(d) {return y(d[y_attr])})
+
+        scatter
+          .selectAll(".innerCircle")
+          // .attr("cx", function (d) { return x(d.innerX);} )
+          .attr("cy", function (d) { return y(d[y_attr]);} )
+
+        // right line
+        scatter
+          .selectAll(".attack")
+          .attr("y1", function (d) { return y(d[y_attr]); } )
+          .attr("y2", function (d) { return y(d[y_attr]); } )
+          .style("stroke", "none")
+
+        scatter
+          .selectAll(".defense")
+          .attr("y1", function (d) { return y(d[y_attr]); } )
+          .attr("y2", function (d) { return y(d[y_attr]); } )
+          .style("stroke", "none")
 			})
 
 			function hide_circle(num, attr){
@@ -362,6 +478,34 @@
 						return "none"
 						})
 			}
+
+      // color palette
+      let itr = 0;
+      color.map(function(d){
+        svg2
+          .append('rect')
+          .attr('width', 35)
+          .attr('height', 35)
+          .attr('x', 0)
+          .attr('y', itr)
+          .style("opacity",0.7)
+          // 設定顏色
+          .attr('fill', d.color);
+        itr += 35;
+      })
+
+      itr = 24
+      color.map(function(d){
+        svg2
+          .append('text')
+          // 設定所在座標
+          .attr('x', 40)
+          .attr('y', itr)
+          // 設定顏色
+          .text(d.type)
+          console.log(d.color, d.type)
+        itr += 35;
+      })
 
       // function updateChart() {
     
