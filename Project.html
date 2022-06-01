@@ -468,31 +468,30 @@
 			}
 
       // color palette
-      let itr = 0;
-      color.map(function(d){
+      let size = 30;
+      color.map(function(d, i){
         svg2
           .append('rect')
-          .attr('width', 35)
-          .attr('height', 35)
+          .attr('width', size)
+          .attr('height', size)
           .attr('x', 0)
-          .attr('y', itr)
+          .attr('y', i*(size+5))
           .style("opacity",0.7)
           // 設定顏色
           .attr('fill', d.color);
         itr += 35;
       })
 
-      itr = 24
-      color.map(function(d){
+      color.map(function(d, i){
         svg2
           .append('text')
           // 設定所在座標
-          .attr('x', 40)
-          .attr('y', itr)
+          .attr('x', size*1.2)
+          .attr('y', i*(size+5) + (size/2))
           // 設定顏色
           .text(d.type)
-          console.log(d.color, d.type)
-        itr += 35;
+          .attr("text-anchor", "left")
+          // .style("fill", d.color)
       })
 
       // function updateChart() {
