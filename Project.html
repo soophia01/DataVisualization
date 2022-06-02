@@ -46,12 +46,7 @@
           width2 = 110 - margin.left - margin.right,
           height2 = 850 - margin.top - margin.bottom;
 
-  // const zoom = d3.zoom()
-  //   .on('zoom', (event) => {
-  //     svg.attr('transform', event.transform);
-  //   })
-  //   .scaleExtent([1, 40]);
-  
+
   // append the svg object to the body of the page
   const svg = d3.select("#my_dataviz")
       .append("svg")
@@ -97,6 +92,8 @@
 
       var x_attr = "CatchRate"
       var y_attr = "Experience"
+
+      data = data.filter( d => d.Type1 == "Grass")
 
 			// add the options to the button
 			d3.select("#selectButton")
@@ -220,7 +217,7 @@
             
 
      
-        let sim = d3.forceSimulation(data);
+      let sim = d3.forceSimulation(data);
       sim.force("collision", d3.forceCollide(d => x(d.outterR))); // Repulsion force
       sim.force("x_force", d3.forceX(d => x(d.CatchRate))); // Each point attacted to its center x and y
       sim.force("y_force", d3.forceY(d => y(d.Experience)));
@@ -231,7 +228,7 @@
       drawPlot(); // Draws scatterplot (points overlap as simulation is off)
       
       function drawPlot(){
-        const outter = svg.selectAll("circle").data(data);
+        const outter = scatter.selectAll("circle").data(data);
         // outer circle
         outter
           .join("circle")
@@ -258,7 +255,7 @@
         })
 
         //  inner circle          
-          const inner = svg
+          const inner = scatter
             .selectAll("dot")
             .data(data)
             .join("circle")
@@ -270,7 +267,7 @@
                 .style("stroke", "black")
         
           // left line                
-          const left = svg.selectAll("dot")
+          const left = scatter.selectAll("dot")
               .data(data)
               .join("line")
                   .attr("class", "attack")
@@ -280,7 +277,7 @@
                   .attr("y2", (d,i) => data2[i].attr('cy') )
                   .style("stroke", "black")
 
-          const right = svg.selectAll("dot")
+          const right = scatter.selectAll("dot")
               .data(data)
               .join("line")
                   .attr("class", "def")
@@ -323,29 +320,20 @@
           //// 因為inner 跟 outter circle的圓心點不一樣，所以要分開寫
           scatter
             .selectAll(".outterCircle")
-            .attr('cx', function(d) {return newX(d[x_attr])})
-            .attr('cy', function(d) {return newY(d[y_attr])})
+            .attr('transform', event.transform)
             // .attr("r", function (d) { return newX(((d.att+d.def)/2)*k); } )
           
           scatter
             .selectAll(".innerCircle")
-            .attr("cx", function (d) { return newX(d.innerX);} )
-            .attr("cy", function (d) { return newY(d[y_attr]); } )
-            // .attr("r", function (d) { return newX(d.innerR); } )
+            .attr('transform', event.transform)
 
           scatter
             .selectAll(".attack")
-            .attr("x1", function(d){ return newX(d[x_attr]) - x(d.outterR);})
-            .attr("x2", function (d) { return newX(d.innerX) - x(d.innerR); } )
-            .attr("y1", function (d) { return newY(d[y_attr]); } )
-            .attr("y2", function (d) { return newY(d[y_attr]); } )
+            .attr('transform', event.transform)
 
           scatter
-            .selectAll(".defense")
-						.attr("x1", function (d) { return newX(d.innerX) + x(d.innerR); } )
-						.attr("x2", function (d) { return newX(d[x_attr]) + x(d.outterR) } )
-						.attr("y1", function (d) { return newY(d[y_attr]); } )
-						.attr("y2", function (d) { return newY(d[y_attr]); } )
+            .selectAll(".def")
+						.attr('transform', event.transform)
 
         });
 
