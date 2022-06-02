@@ -3,6 +3,8 @@
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+
 <!-- Initialize a select button -->
 <label for="selectButton">please choose Final Evolution or not</label>
 <select id="selectButton"></select>
@@ -290,7 +292,7 @@
             .selectAll(".outterCircle")
             .attr('cx', function(d) {return newX(d[x_attr])})
             .attr('cy', function(d) {return newY(d[y_attr])})
-            // .attr("r", function (d) { return newX(d.outterR); } )
+            // .attr("r", function (d) { return newX(((d.att+d.def)/2)*k); } )
           
           scatter
             .selectAll(".innerCircle")
@@ -300,15 +302,15 @@
 
           scatter
             .selectAll(".attack")
-            .attr("x1", function (d) { return newX(d.leftX1); } )
-            .attr("x2", function (d) { return newX(d.leftX2); } )
+            .attr("x1", function(d){ return newX(d[x_attr]) - x(d.outterR);})
+            .attr("x2", function (d) { return newX(d.innerX) - x(d.innerR); } )
             .attr("y1", function (d) { return newY(d[y_attr]); } )
             .attr("y2", function (d) { return newY(d[y_attr]); } )
 
           scatter
             .selectAll(".defense")
-						.attr("x1", function (d) { return newX(d.rightX1); } )
-						.attr("x2", function (d) { return newX(d.rightX2) } )
+						.attr("x1", function (d) { return newX(d.innerX) + x(d.innerR); } )
+						.attr("x2", function (d) { return newX(d[x_attr]) + x(d.outterR) } )
 						.attr("y1", function (d) { return newY(d[y_attr]); } )
 						.attr("y2", function (d) { return newY(d[y_attr]); } )
 
@@ -356,6 +358,14 @@
       d3.select("#Xaxis_change").on("change", function(event, d) {
 				// recover the option that has been chosen
 				x_attr = d3.select("#Xaxis_change").property("value")
+        let data2 = data.map(function(d){
+          let obj = {}
+          obj.outterR = x(d.outterR)
+          obj.innerR = x(d.innerR)
+          obj.attr = d[x_attr]
+          return obj
+        })
+        console.log(data2)
 
         d3.select("#Xaxis").text(x_attr)
 
@@ -370,21 +380,18 @@
           .selectAll(".outterCircle")
           .attr('cx', function(d) {return x(d[x_attr])})
 
-        scatter
-          .selectAll(".innerCircle")
-          // .attr("cx", function (d) { return x(d.innerX);} )
-          .attr("cx", function (d) { return x(d[x_attr]);} )
-        
-        scatter
-          .selectAll(".attack")
-          .attr("y1", function (d) { return y(d[x_attr]); } )
-          .attr("y2", function (d) { return y(d[x_attr]); } )
-          .style("stroke", "none")
+        svg.selectAll(".LegendaryDot")
+          .attr("cx", function(d) {return x(d.innerX)})
 
-        scatter
-          .selectAll(".defense")
-          .attr("y1", function (d) { return y(d[x_attr]); } )
-          .attr("y2", function (d) { return y(d[x_attr]); } )
+        Line_att
+          .data(data2)
+          .attr("x1", function (d) { return x(d.attr) - d.outterR; } )
+          .attr("x2", function (d) { return x(d.attr); } )
+          // .style("stroke", "none")
+
+        Line_Def
+          .attr("x1", function (d) { return x(d.attr); } )
+          .attr("x2", function (d) { return x(d.attr) + d.outterR } )
           .style("stroke", "none")
         
 			})
@@ -477,18 +484,14 @@
           .attr('x', 0)
           .attr('y', i*(size+5))
           .style("opacity",0.7)
-          // 設定顏色
           .attr('fill', d.color);
-        itr += 35;
       })
 
       color.map(function(d, i){
         svg2
           .append('text')
-          // 設定所在座標
           .attr('x', size*1.2)
           .attr('y', i*(size+5) + (size/2))
-          // 設定顏色
           .text(d.type)
           .attr("text-anchor", "left")
           // .style("fill", d.color)
