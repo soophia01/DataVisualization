@@ -379,7 +379,7 @@
 
         let x_max = x_attr != "CatchRate" ? d3.max(data.map(function (d) { return d[x_attr]})) : 260
         
-        d3.selectAll("#Yaxis").text(y_attr != "Experience" ? y_attr: "Experience to level 100")
+        d3.selectAll("#Xaxis").text(x_attr != "Experience" ? x_attr: "Experience to level 100")
         
         x.domain( [0, x_max] )
 
