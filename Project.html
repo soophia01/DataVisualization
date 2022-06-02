@@ -63,13 +63,67 @@
   .append("g");
   
   //Read the data
-  d3.csv("All_Pokemon4.csv").then( function(data) {
-      const allGroup = ["ALL", "Final Evolution", "NOT Final Evoulution"]
-      const attr = ['ALL','Grass', 'Fighting', 'Bug', 'Poison', 'Water', 'Ghost', 'Fire',
-       'Ground', 'Normal', 'Rock', 'Ice', 'Psychic', 'Electric', 'Dark',
-       'Dragon', 'Steel', 'Flying', 'Fairy']
-			const keys = allGroup.keys()
-      const color =[
+  const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
+  const attr = ['Grass', 'Fighting', 'Bug', 'Poison', 'Water', 'Ghost', 'Fire',
+    'Ground', 'Normal', 'Rock', 'Ice', 'Psychic', 'Electric', 'Dark',
+    'Dragon', 'Steel', 'Flying', 'Fairy', 'ALL']
+
+  const keys = allGroup.keys()
+  // add the options to the button
+  d3.select("#selectButton")
+    .selectAll('myOptions')
+    .data(allGroup)
+      .enter()
+      .append('option')
+    .text(function (d) { return d; }) // text showed in the menu
+    .data(keys)
+    .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+  d3.select("#attrselect")
+    .selectAll('myOptions')
+    .data(attr)
+      .enter()
+      .append('option')
+    .text(function (d) { return d; }) // text showed in the menu
+    .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+  // Add X axis
+  var x = d3.scaleLinear()
+      .domain([0, 260])
+      .range([ 0, width ]);
+  var xAxis = svg.append("g")
+    .attr("class", "myAxis_x")
+    .attr("transform", `translate(0, ${height})`)
+    .call(d3.axisBottom(x));
+
+  // Add Y axis
+  var y = d3.scaleLinear()
+        .domain([0, 1800000])
+        .range([ height, 0]);
+  var yAxis = svg.append("g")
+    .attr("class", "myAxis")
+    .call(d3.axisLeft(y));
+
+  // text label for the x axis
+  svg.append("text")
+        .attr("id", "Xaxis")             
+      	.attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top + 20) + ")")
+      	.style("text-anchor", "middle")
+      	.text("Catch Rate");
+
+  // text label for the y axis
+  svg.append("text")
+        .attr("id", "Yaxis")  
+      	.attr("transform", "rotate(-90)")
+      	.attr("y", 0 - margin.left)
+      	.attr("x",0 - (height / 2))
+      	.attr("dy", "1em")
+      	.style("text-anchor", "middle")
+      	.text("Experience to level 100"); 
+        
+  const color =[
         {"type":"Bug", "color":"#89a80d"},
         {"type":"Dark", "color":"#5e4131D"},
         {"type":"Dragon", "color":"#FF4D00"},
@@ -89,68 +143,34 @@
         {"type":"Steel", "color":"#a5a4c3"},
         {"type":"Water", "color":"#5181f9"}
       ]
+    
+
 
       var x_attr = "CatchRate"
       var y_attr = "Experience"
 
-      data = data.filter( d => d.Type1 == "Grass")
+    var newX = 0;
+    var neWY = 0;
 
-			// add the options to the button
-			d3.select("#selectButton")
-				.selectAll('myOptions')
-				.data(allGroup)
-					.enter()
-					.append('option')
-				.text(function (d) { return d; }) // text showed in the menu
-				.data(keys)
-				.attr("value", function (d) { return d; }) // corresponding value returned by the button
+  function update_all(num, attr){
+    // readdata
+    d3.csv("All_Pokemon4.csv").then( function(data) {
+      
+      if(attr != 0 && num != 2){
+        data = data.filter( d => (d.Type1 == attr || d.Type2 == attr) && d.FinalEvolution == num)
+      }else if(attr == 0 && num != 2){
+        data = data.filter( d => d.FinalEvolution == num )
+      } else if (attr == 0 && num == 2){
+        data = data
+      }else if(attr != 0 &&  num == 2){
+        console.log(attr)
+        data = data.filter( d => (d.Type1 == attr || d.Type2 == attr))
+      }
+      
+      xAxis.call(d3.axisBottom(x))
+      yAxis.call(d3.axisLeft(y))
 
-      d3.select("#attrselect")
-        .selectAll('myOptions')
-        .data(attr)
-          .enter()
-          .append('option')
-        .text(function (d) { return d; }) // text showed in the menu
-        .attr("value", function (d) { return d; }) // corresponding value returned by the button
-
-      // Add X axis
-      const x = d3.scaleLinear()
-        .domain([0, 260])
-        .range([ 0, width ]);
-      var xAxis = svg.append("g")
-        .attr("class", "myAxis_x")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x));
-
-      // text label for the x axis
-  		svg.append("text")
-        .attr("id", "Xaxis")             
-      	.attr("transform",
-            "translate(" + (width/2) + " ," + 
-                           (height + margin.top + 20) + ")")
-      	.style("text-anchor", "middle")
-      	.text("Catch Rate");
-  
-      // Add Y axis
-      const y = d3.scaleLinear()
-        .domain([0, 1800000])
-        .range([ height, 0]);
-      var yAxis = svg.append("g")
-				.attr("class", "myAxis")
-				.call(d3.axisLeft(y));
-
-			// text label for the y axis
-  		svg.append("text")
-        .attr("id", "Yaxis")  
-      	.attr("transform", "rotate(-90)")
-      	.attr("y", 0 - margin.left)
-      	.attr("x",0 - (height / 2))
-      	.attr("dy", "1em")
-      	.style("text-anchor", "middle")
-      	.text("Experience to level 100");  
-
-
-		  // Add a clipPath: everything out of this area won't be drawn.
+      // Add a clipPath: everything out of this area won't be drawn.
 		  var clip = svg.append("defs").append("svg:clipPath")
           .attr("id", "clip")
           .append("svg:rect")
@@ -158,9 +178,10 @@
           .attr("height", height )
           .attr("x", 0)
           .attr("y", 0);
-    
+
       // Create the scatter variable: where both the circles and the brush take place
       var scatter = svg.append('g')
+        .attr("id", "clip-path")
         .attr("clip-path", "url(#clip)")
       
       // Add dots
@@ -205,6 +226,9 @@
         .attr("stop-opacity", "0.7")
         // console.log( data.map(function(d) { return d.Type1}))
         .style("stop-color",  function (d) { 
+          if(d.Type1 == attr || d.Type2 == attr){
+            console.log(attr)
+          }
           for(let i = 0 ; i < color.length ; i++){
               if(d.Type1 == ''){
                 return d3.color("#FFFFFF")
@@ -218,9 +242,10 @@
 
      
       let sim = d3.forceSimulation(data);
+      sim.restart()
       sim.force("collision", d3.forceCollide(d => x(d.outterR))); // Repulsion force
-      sim.force("x_force", d3.forceX(d => x(d.CatchRate))); // Each point attacted to its center x and y
-      sim.force("y_force", d3.forceY(d => y(d.Experience)));
+      sim.force("x_force", d3.forceX(d => x(d[x_attr]))); // Each point attacted to its center x and y
+      sim.force("y_force", d3.forceY(d => y(d[y_attr])));
       sim.on('tick', drawPlot)
       .on('end', drawLine ) 
         
@@ -233,8 +258,8 @@
         outter
           .join("circle")
             .attr("class", "outterCircle myDot")
-            .attr("cx", d => x(d.CatchRate))
-            .attr("cy", d => y(d.Experience))
+            .attr("cx", d => x(d[x_attr]))
+            .attr("cy", d => y(d[y_attr]))
             .attr("r", d => d.outterR)
             .style("stroke", "black")
             .style("fill", "transparent")
@@ -290,17 +315,17 @@
       }
 
       function changeRepulsion(isCheckboxChecked=1){
-      if (isCheckboxChecked){
-        sim.force("collision", d3.forceCollide(d => d.outterR)); // Add repulsion force back
-      } else {
-        sim.force("collision", null); // Removes repulsion force
+        if (isCheckboxChecked){
+          sim.force("collision", d3.forceCollide(d => d.outterR)); // Add repulsion force back
+        } else {
+          sim.force("collision", null); // Removes repulsion force
+        }
+      
+        sim.alpha(1); // Alpha value of 1 resets simulation back to beginning
+        sim.restart();
       }
-    
-      sim.alpha(1); // Alpha value of 1 resets simulation back to beginning
-      sim.restart();
-    }
 
-    changeRepulsion(1)
+      changeRepulsion(1)
 
 
       const zoom = d3.zoom()
@@ -309,8 +334,8 @@
         .on('zoom', (event) => {
 
           // recover the new scale
-          var newX = event.transform.rescaleX(x);
-          var newY = event.transform.rescaleY(y);
+          newX = event.transform.rescaleX(x);
+          newY = event.transform.rescaleY(y);
 
           // update axes with these new boundaries
           xAxis.call(d3.axisBottom(newX))
@@ -336,7 +361,7 @@
 						.attr('transform', event.transform)
 
         });
-
+      
       // This add an invisible rect on top of the chart area. This rect can recover pointer events: necessary to understand when the user zoom
       var focus = svg.append("rect")
         .attr("width", width)
@@ -345,181 +370,40 @@
         .style("pointer-events", "all")
         .lower()
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+     
       
       focus.call(zoom);
-				
-			// A function that update the chart
-			function update(selectedGroup, attr) {
-				if(selectedGroup == "1"){
-					hide_circle(0, attr)
-				}else if (selectedGroup == "2"){
-					hide_circle(1, attr)
-				}else if(selectedGroup == "0"){
-					display_all(attr);
-				}	
-      }
-
-			// When the button is changed, run the updateChart function
-			d3.select("#selectButton").on("change", function(event,d) {
-				// recover the option that has been chosen
-        const selectedattr = d3.select("#attrselect").property("value")
-				const selectedOption = d3.select(this).property("value")
-        // run the updateChart function with this selected option
-        update(selectedOption, selectedattr)
-			})
-
-      d3.select("#attrselect").on("change", function(event, d) {
-				// recover the option that has been chosen
-				const selectedOption = d3.select("#selectButton").property("value")
-        const selectedattr = d3.select(this).property("value")
-        // run the updateChart function with this selected option
-        update(selectedOption, selectedattr)
-			})
 
       d3.select("#Xaxis_change").on("change", function(event, d) {
-				// recover the option that has been chosen
 				x_attr = d3.select("#Xaxis_change").property("value")
-        let data2 = data.map(function(d){
-          let obj = {}
-          obj.outterR = x(d.outterR)
-          obj.innerR = x(d.innerR)
-          obj.attr = d[x_attr]
-          return obj
-        })
-        console.log(data2)
 
-        d3.select("#Xaxis").text(x_attr)
-
-        x.domain( [0, d3.max(data.map(function(d) { return d[x_attr]; }))] )
+        let x_max = x_attr != "CatchRate" ? d3.max(data.map(function (d) { return d[x_attr]})) : 260
+        
+        d3.selectAll("#Yaxis").text(y_attr != "Experience" ? y_attr: "Experience to level 100")
+        
+        x.domain( [0, x_max] )
 
         svg.select(".myAxis_x")
           .transition()
           .duration(1000)
           .call(d3.axisBottom(x))
-
-        scatter
-          .selectAll(".outterCircle")
-          .attr('cx', function(d) {return x(d[x_attr])})
-
-        svg.selectAll(".LegendaryDot")
-          .attr("cx", function(d) {return x(d.innerX)})
-
-        Line_att
-          .data(data2)
-          .attr("x1", function (d) { return x(d.attr) - d.outterR; } )
-          .attr("x2", function (d) { return x(d.attr); } )
-          // .style("stroke", "none")
-
-        Line_Def
-          .attr("x1", function (d) { return x(d.attr); } )
-          .attr("x2", function (d) { return x(d.attr) + d.outterR } )
-          .style("stroke", "none")
-        
-			})
+      })
 
       d3.select("#Yaxis_change").on("change", function(event, d) {
-				// recover the option that has been chosen
-				y_attr = d3.select("#Yaxis_change").property("value")
+				x_attr = d3.select("#Yaxis_change").property("value")
 
-        y.domain( [0, d3.max(data.map(function(d) { return d[y_attr]; }))] )
+        let y_max = y_attr != "Experience" ? d3.max(data.map(function (d) { return d[y_attr]})) :1800000
+        
+        d3.selectAll("#Yaxis").text(y_attr != "Experience" ? y_attr: "Experience to level 100")
+        
+        y.domain( [0, y_max] )
 
         svg.select(".myAxis")
           .transition()
           .duration(1000)
           .call(d3.axisLeft(y))
-
-        d3.select("#Yaxis").text(y_attr)
-        scatter
-          .selectAll(".outterCircle")
-          .attr('cy', function(d) {return y(d[y_attr])})
-
-        scatter
-          .selectAll(".innerCircle")
-          // .attr("cx", function (d) { return x(d.innerX);} )
-          .attr("cy", function (d) { return y(d[y_attr]);} )
-
-        // right line
-        scatter
-          .selectAll(".attack")
-          .attr("y1", function (d) { return y(d[y_attr]); } )
-          .attr("y2", function (d) { return y(d[y_attr]); } )
-          .style("stroke", "none")
-
-        scatter
-          .selectAll(".defense")
-          .attr("y1", function (d) { return y(d[y_attr]); } )
-          .attr("y2", function (d) { return y(d[y_attr]); } )
-          .style("stroke", "none")
-			})
-
-			function hide_circle(num, attr){
-				Line_att
-					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "black"} return "none"})
-
-				Line_Def
-					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "black"} return "none"})
-
-        d3.selectAll(".circleColor stop")
-          .attr("stop-opacity", function (d) { if(d.FinalEvolution !=num && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return 0.7} return 0})
-
-				d3.selectAll(".myDot")
-					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "black"} return "none"})
-
-				svg.selectAll(".LegendaryDot")
-					.style("stroke", function (d) { if(d.FinalEvolution!=num && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "black"} return "none"})
-					.style("fill", function (d) { 
-						if(d.FinalEvolution != num && d.Legendary == 1 && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "red"}
-            else if(d.FinalEvolution != num && d.Legendary != 1 && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "white"}
-						return "none"
-						})
-			}
-
-			function display_all(attr){
-				Line_att
-					.style("stroke",  function (d) { if(d.Type1==attr || d.Type2==attr || attr == "ALL"){return "black"} return "none"})
-
-				Line_Def
-					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr || attr == "ALL"){return "black"} return "none"})
-
-        d3.selectAll(".circleColor stop").attr("stop-opacity", function (d) { if(d.Type1==attr || d.Type2==attr || attr == "ALL"){return 0.7} return 0})
-
-				d3.selectAll("circle")
-					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr || attr == "ALL"){return "black"} return "none"})
-
-				svg.selectAll(".LegendaryDot")
-					.style("stroke", function (d) { if(d.Type1==attr || d.Type2==attr || attr == "ALL"){return "black"} return "none"})
-					.style("fill", function (d) { 
-						if( d.Legendary == 1 && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "red"}
-            else if ( d.Legendary == 0 && (d.Type1==attr || d.Type2==attr || attr == "ALL")){return "white"}
-						return "none"
-						})
-			}
-
-      // color palette
-      let size = 30;
-      color.map(function(d, i){
-        svg2
-          .append('rect')
-          .attr('width', size)
-          .attr('height', size)
-          .attr('x', 0)
-          .attr('y', i*(size+5))
-          .style("opacity",0.7)
-          .attr('fill', d.color);
       })
 
-      color.map(function(d, i){
-        svg2
-          .append('text')
-          .attr('x', size*1.2)
-          .attr('y', i*(size+5) + (size/2))
-          .text(d.type)
-          .attr("text-anchor", "left")
-          // .style("fill", d.color)
-      })
-
-      // function updateChart() {
-    
       //   // recover the new scale
       //   var newX = d3.event.transform.rescaleX(x);
       //   var newY = d3.event.transform.rescaleY(y);
@@ -536,5 +420,71 @@
       // }
 
   })
+
+}
+
+function drawcolor(){
+  // color palette
+  let size = 30;
+    color.map(function(d, i){
+      svg2
+        .append('rect')
+        .attr('width', size)
+        .attr('height', size)
+        .attr('x', 0)
+        .attr('y', i*(size+5))
+        .style("opacity",0.7)
+        .attr('fill', d.color);
+    })
+
+    color.map(function(d, i){
+      svg2
+        .append('text')
+        .attr('x', size*1.2)
+        .attr('y', i*(size+5) + (size/2))
+        .text(d.type)
+        .attr("text-anchor", "left")
+        // .style("fill", d.color)
+    })
+}
+
+function del(){
+  d3.selectAll("circle").remove()
+  d3.selectAll("#clip").remove()
+  d3.selectAll("defs").remove()
+  d3.selectAll("Line").remove()
+  d3.selectAll("rect").remove()
+  drawcolor()
+}
+
+// A function that update the chart
+function update(selectedGroup, attr_choose) {
+  if(attr_choose == "ALL") attr_choose = 0
+    del()
+    update_all(selectedGroup, attr_choose)
+}
+
+// When the button is changed, run the updateChart function
+d3.select("#selectButton").on("change", function(event,d) {
+  // recover the option that has been chosen
+  const selectedattr = d3.select("#attrselect").property("value")
+  const selectedOption = d3.select(this).property("value")
+  // run the updateChart function with this selected option
+  update(selectedOption, selectedattr)
+})
+
+d3.select("#attrselect").on("change", function(event, d) {
+  // recover the option that has been chosen
+  const selectedOption = d3.select("#selectButton").property("value")
+  const selectedattr = d3.select(this).property("value")
+  // run the updateChart function with this selected option
+  update(selectedOption, selectedattr)
+})
+
+
+update_all(1, "Grass")
+drawcolor()
+
+
 
 </script>
