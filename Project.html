@@ -219,58 +219,91 @@
         })
             
 
-      // outer circle
-      scatter
-        .selectAll("dot")
-        .data(data)
-        .join("circle")
-          .attr("class", "myDot outterCircle")
-          .attr("cx", function (d) { return x(d.CatchRate); } )
-          .attr("cy", function (d) { return y(d.Experience); } )
-          .attr("r", function (d) { return x(d.outterR); } )
-          .style("stroke", "black")
-          .style("fill", "transparent")
-          .style("fill", function (d) { 
-            return "url(#"+d.pid+")"; 
-          });
+     
+        let sim = d3.forceSimulation(data);
+      sim.force("collision", d3.forceCollide(d => x(d.outterR))); // Repulsion force
+      sim.force("x_force", d3.forceX(d => x(d.CatchRate))); // Each point attacted to its center x and y
+      sim.force("y_force", d3.forceY(d => y(d.Experience)));
+      sim.on('tick', drawPlot)
+      .on('end', drawLine ) 
         
+      sim.stop(); // Simulation is off initially
+      drawPlot(); // Draws scatterplot (points overlap as simulation is off)
       
-      // inner circle          
-      scatter
-        .selectAll("dot")
-        .data(data)
-        .join("circle")
-          .attr("class", "LegendaryDot innerCircle")
-          .attr("cx", function (d) { return x(d.innerX);} )
-          .attr("cy", function (d) { return y(d.Experience); } )
-          .attr("r", function (d) { return x(d.innerR); } )
-          .attr("opacity", "0.5")
-          .style("fill", function (d) { if(d.Legendary=="1"){return "red"} return "white"})
-          .style("stroke", "black")
+      function drawPlot(){
+        const outter = svg.selectAll("circle").data(data);
+        // outer circle
+        outter
+          .join("circle")
+            .attr("class", "outterCircle myDot")
+            .attr("cx", d => x(d.CatchRate))
+            .attr("cy", d => y(d.Experience))
+            .attr("r", d => d.outterR)
+            .style("stroke", "black")
+            .style("fill", "transparent")
+            .style("fill", function (d) { 
+              return "url(#"+d.pid+")"; 
+            });
 
-      // left line      
-      Line_att = scatter
-				.selectAll("dot")
-				.data(data)
-				.join("line")
-            .attr("class", "attack")
-            .attr("x1", function (d) { return x(d.leftX1); } )
-            .attr("x2", function (d) { return x(d.leftX2) } )
-						.attr("y1", function (d) { return y(d.Experience); } )
-						.attr("y2", function (d) { return y(d.Experience); } )
-						.style("stroke", "black")
-  
-      // right line
-			Line_Def = scatter
-      .selectAll("dot")
-      .data(data)
-      .join("line")
-        .attr("class", "defense")
-        .attr("x1", function (d) { return x(d.rightX1) } )
-        .attr("x2", function (d) { return x(d.rightX2) } )
-        .attr("y1", function (d) { return y(d.Experience); } )
-        .attr("y2", function (d) { return y(d.Experience); } )
-        .style("stroke", "black")
+        outter
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+
+      }
+
+      function drawLine(){
+        var data2 = [];
+        d3.selectAll('.outterCircle').each(function (d, i) {
+          data2.push(d3.select(this))
+        })
+
+        //  inner circle          
+          const inner = svg
+            .selectAll("dot")
+            .data(data)
+            .join("circle")
+                .attr("class", "innerCircle LegendaryDot")
+                .attr("cx", (d,i) => parseInt(data2[i].attr('cx')) - d.outterR + d.Att*0.1)
+                .attr("cy",(d, i) => data2[i].attr('cy')) 
+                .attr("r", d => d.innerR)
+                .style("fill", d => d.Legendary=="1" ?"red":"white")
+                .style("stroke", "black")
+        
+          // left line                
+          const left = svg.selectAll("dot")
+              .data(data)
+              .join("line")
+                  .attr("class", "attack")
+                  .attr("x1", (d,i) => parseInt(data2[i].attr('cx')) - parseInt(data2[i].attr('r')))
+                  .attr("x2", (d,i) => parseInt(data2[i].attr('cx')) - parseInt(data2[i].attr('r'))/4 + d.Att*0.1 - parseInt(data2[i].attr('r')))
+                  .attr("y1", (d,i) => data2[i].attr('cy') )
+                  .attr("y2", (d,i) => data2[i].attr('cy') )
+                  .style("stroke", "black")
+
+          const right = svg.selectAll("dot")
+              .data(data)
+              .join("line")
+                  .attr("class", "def")
+                  .attr("x1", (d,i) => parseInt(data2[i].attr('cx')) + parseInt(data2[i].attr('r'))  - d.Def*0.1 + parseInt(data2[i].attr('r'))/4)
+                  .attr("x2", (d,i) => parseInt(data2[i].attr('cx')) + parseInt(data2[i].attr('r')))
+                  .attr("y1", (d,i) =>  data2[i].attr('cy') )
+                  .attr("y2", (d,i) => data2[i].attr('cy') )
+                  .style("stroke", "black")
+          
+      }
+
+      function changeRepulsion(isCheckboxChecked=1){
+      if (isCheckboxChecked){
+        sim.force("collision", d3.forceCollide(d => d.outterR)); // Add repulsion force back
+      } else {
+        sim.force("collision", null); // Removes repulsion force
+      }
+    
+      sim.alpha(1); // Alpha value of 1 resets simulation back to beginning
+      sim.restart();
+    }
+
+    changeRepulsion(1)
 
 
       const zoom = d3.zoom()
