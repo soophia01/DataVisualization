@@ -143,14 +143,19 @@
         {"type":"Steel", "color":"#a5a4c3"},
         {"type":"Water", "color":"#5181f9"}
       ]
-    
+  const max_val = [
+      {"attr":"CathRate", "value" : 260},
+      {"attr":"Height", "value" :25},
+      {"attr":"BMI", "value" : 99990},
+      {"attr":"Weight", "value" : 1000},
+      {"attr":"Experience", "value" : 1800000}
+    ]
 
+  var x_attr = "CatchRate"
+  var y_attr = "Experience"
 
-      var x_attr = "CatchRate"
-      var y_attr = "Experience"
-
-    var newX = 0;
-    var neWY = 0;
+  var newX = 0;
+  var neWY = 0;
 
   function update_all(num, attr){
     // readdata
@@ -226,9 +231,6 @@
         .attr("stop-opacity", "0.7")
         // console.log( data.map(function(d) { return d.Type1}))
         .style("stop-color",  function (d) { 
-          if(d.Type1 == attr || d.Type2 == attr){
-            console.log(attr)
-          }
           for(let i = 0 ; i < color.length ; i++){
               if(d.Type1 == ''){
                 return d3.color("#FFFFFF")
@@ -377,31 +379,37 @@
       d3.select("#Xaxis_change").on("change", function(event, d) {
 				x_attr = d3.select("#Xaxis_change").property("value")
 
-        let x_max = x_attr != "CatchRate" ? d3.max(data.map(function (d) { return d[x_attr]})) : 260
+        let x_max = 0
+        max_val.map(function(k, v){
+          if (k.attr == x_attr) x_max = k.value
+        })
+
+        if(x_max == 0) x_max = d3.max(data.map(function (d) { return d[x_attr]}))
         
         d3.selectAll("#Xaxis").text(x_attr != "Experience" ? x_attr: "Experience to level 100")
         
         x.domain( [0, x_max] )
 
-        svg.select(".myAxis_x")
-          .transition()
-          .duration(1000)
-          .call(d3.axisBottom(x))
+        del()
+        update_all(num, attr)
       })
 
       d3.select("#Yaxis_change").on("change", function(event, d) {
-				x_attr = d3.select("#Yaxis_change").property("value")
+        y_attr = d3.select("#Yaxis_change").property("value")
 
-        let y_max = y_attr != "Experience" ? d3.max(data.map(function (d) { return d[y_attr]})) :1800000
+        let y_max = 0
+        max_val.map(function(k, v){
+          if (k.attr == y_attr) y_max = k.value
+        })
+
+        if(y_max == 0) y_max = d3.max(data.map(function (d) { return d[y_attr]}))
         
         d3.selectAll("#Yaxis").text(y_attr != "Experience" ? y_attr: "Experience to level 100")
         
         y.domain( [0, y_max] )
-
-        svg.select(".myAxis")
-          .transition()
-          .duration(1000)
-          .call(d3.axisLeft(y))
+        
+        del()
+        update_all(num, attr)
       })
 
       //   // recover the new scale
