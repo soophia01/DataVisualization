@@ -14,22 +14,22 @@
 <select id="attrselect"></select>
 <br>
 
-<!-- x, y 軸還要再修QQQQ -->
-<label for="Xaxis_change">please choose the Xaxis(努力中)</label>
+
+<label for="Xaxis_change">please choose the Xaxis</label>
 <select id="Xaxis_change">
   <option value="BMI">BMI</option>
   <option value="Height">Height</option>
   <option value="Weight">Weight</option>
   <option value="Experience">Experience to level 100</option>
-  <option value="CatchRate">CatchRate</option>
+  <option value="CatchRate" selected>CatchRate</option>
 </select>
 <br>
-<label for="Yaxis_change">please choose the Yaxis(努力中)</label>
+<label for="Yaxis_change">please choose the Yaxis</label>
 <select id="Yaxis_change">
   <option value="BMI">BMI</option>
   <option value="Height">Height</option>
   <option value="Weight">Weight</option>
-  <option value="Experience">Experience to level 100</option>
+  <option value="Experience" selected>Experience to level 100</option>
   <option value="CatchRate">CatchRate</option>
 </select>
 
@@ -156,6 +156,7 @@
 
   var newX = 0;
   var neWY = 0;
+  var transform_event = 0
 
   function update_all(num, attr){
     // readdata
@@ -313,6 +314,13 @@
                   .attr("y1", (d,i) =>  data2[i].attr('cy') )
                   .attr("y2", (d,i) => data2[i].attr('cy') )
                   .style("stroke", "black")
+
+          if(transform_event != 0){
+              if($(".innerCircle").length > 0){
+              // Apply the troom.transformansform:
+              focus.call(zoom.transform, transform_event);
+            }
+          }
           
       }
 
@@ -335,10 +343,10 @@
         .extent([[0, 0], [width, height]])
         .on('zoom', (event) => {
 
+          transform_event = event.transform
           // recover the new scale
           newX = event.transform.rescaleX(x);
           newY = event.transform.rescaleY(y);
-
           // update axes with these new boundaries
           xAxis.call(d3.axisBottom(newX))
           yAxis.call(d3.axisLeft(newY))
@@ -376,6 +384,31 @@
       
       focus.call(zoom);
 
+      function wait_line(){
+        if(transform_event != 0){
+          // Create an identity transform 
+          focus.call(zoom.transform, transform_event);
+        }
+      }
+
+      wait_line()
+
+      function call_circle(){
+        d3.selectAll("Line").remove()
+        sim.restart()
+        sim.force("collision", d3.forceCollide(d => x(d.outterR))); // Repulsion force
+        sim.force("x_force", d3.forceX(d => x(d[x_attr]))); // Each point attacted to its center x and y
+        sim.force("y_force", d3.forceY(d => y(d[y_attr])));
+        sim.on('tick', drawPlot)
+        sim.on('end', drawLine)
+
+        sim.stop(); // Simulation is off initially
+        drawPlot();
+
+        changeRepulsion(1)
+        wait_line()
+      }
+
       d3.select("#Xaxis_change").on("change", function(event, d) {
 				x_attr = d3.select("#Xaxis_change").property("value")
 
@@ -390,8 +423,8 @@
         
         x.domain( [0, x_max] )
 
-        del()
-        update_all(num, attr)
+        call_circle()
+        
       })
 
       d3.select("#Yaxis_change").on("change", function(event, d) {
@@ -407,9 +440,8 @@
         d3.selectAll("#Yaxis").text(y_attr != "Experience" ? y_attr: "Experience to level 100")
         
         y.domain( [0, y_max] )
-        
-        del()
-        update_all(num, attr)
+
+        call_circle()
       })
 
       //   // recover the new scale
