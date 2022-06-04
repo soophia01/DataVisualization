@@ -45,6 +45,8 @@
   const margin2 = {top: 10, right: 30, bottom: 30, left: 100},
           width2 = 110 - margin.left - margin.right,
           height2 = 850 - margin.top - margin.bottom;
+  const svgr_w = 500 - margin.top - margin.bottom,
+        svgr_margin = {left: 250, top:230};
 
 
   // append the svg object to the body of the page
@@ -61,9 +63,107 @@
     .attr("width", width2 + margin2.left + margin2.right)
     .attr("height", height2 + margin2.top + margin2.bottom)
   .append("g");
+
+  const svg_radar = d3.select("#my_dataviz")
+      .append("svg")
+      .attr("width", svgr_w + margin.top + margin.right)
+      .attr("height", svgr_w + margin.top + margin.bottom)
+      .style("position", "absolute")
+      .style("top", "10px")
+      .append("g")
+      .attr("transform", `translate(${svgr_margin.left}, ${svgr_margin.top})`);
   
-  //Read the data
-  const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
+  const img = d3.select("#my_dataviz")
+      .append("svg")
+      .attr("width", svgr_w + margin.top + margin.right)
+      .attr("height", svgr_w + margin.top + margin.bottom)
+      .append("g");
+  
+  // Radar config ---------------------------------------
+  const axisCircles = 5
+  const radius = 180
+  const containerWidth = svgr_w-(svgr_margin.left*2);
+  const containerHeight = svgr_w-(svgr_margin.left*2);
+  // Radar axis
+  const axesDomain = [ "HP", "Spa", "Def", "Spd", "Att" ]
+  const maxValue = 1 // The max value in data
+  const angleSlice = 1.256 // Math.PI * 2 /axis.lengh 
+  const axisLabelFactor = 1.12
+  const dotRadius = 4
+  const radarLine = d3.lineRadial()
+          .curve(d3["curveLinear"])
+          .radius(d => rScale(d))
+          .angle((d, i) => i * angleSlice)
+    
+  const radians =  2 * Math.PI
+  const total = 5
+  const factorLegend = 0.85
+
+  var rScale = d3.scaleLinear()
+        .domain([0, maxValue])
+        .range([0, radius])
+
+  function imageExists(image_url){
+
+    var http = new XMLHttpRequest();
+    http.open('HEAD', image_url, false);
+    http.send();
+    return http.status != 404;
+
+  }
+
+  function RadarPlot(){
+
+    svg_radar.append('g')
+      .attr("width", containerWidth)
+      .attr("height", containerHeight)
+      .style("opacity", 1)
+      .attr("class", "container");
+
+    var axisGrid = d3.select(".container")
+                  .append("g")
+                  .attr("class", "axisWrapper");
+    //circle    
+    axisGrid.selectAll(".levels")
+      .data(d3.range(1,(axisCircles+1)).reverse())
+      .enter()
+        .append("circle")
+        .attr("class", "gridCircle")
+        .attr("r", (d, i) => radius/axisCircles*d)
+        .style("fill", "#CDCDCD")
+        .style("stroke", "#CDCDCD")
+        .style("fill-opacity", 0.1);
+
+    const axis = axisGrid.selectAll(".axis")
+      .data(axesDomain)
+      .enter()
+        .append("g")
+        .attr("class", "axis");
+
+    axis.append("line")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", (d, i) => rScale(maxValue*1.1) * Math.cos(angleSlice*i - Math.PI/2))
+      .attr("y2", (d, i) => rScale(maxValue*1.1) * Math.sin(angleSlice*i - Math.PI/2))
+      .attr("class", "line")
+      .style("stroke", "white")
+      .style("stroke-width", "2px");
+              
+    // Radar axis label
+
+    axis.append("text")
+      .attr("class", "legend")
+      .style("font-size", "20px")
+      .attr("text-anchor", "middle")
+      .attr("font-family", "monospace")
+      .attr("dy", "0.35em")
+      .attr("x", (d, i) => rScale(maxValue * axisLabelFactor) * Math.cos(angleSlice*i - Math.PI/2))
+      .attr("y", (d, i) => rScale(maxValue * axisLabelFactor) * Math.sin(angleSlice*i - Math.PI/2))
+      .text(d => d);
+    }
+
+//Read the data
+const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
   const attr = ['Grass', 'Fighting', 'Bug', 'Poison', 'Water', 'Ghost', 'Fire',
     'Ground', 'Normal', 'Rock', 'Ice', 'Psychic', 'Electric', 'Dark',
     'Dragon', 'Steel', 'Flying', 'Fairy', 'ALL']
@@ -158,9 +258,151 @@
   var neWY = 0;
   var transform_event = 0
 
+  const tooltip = d3.select("#my_dataviz")
+                        .append("div")
+                        .style("opacity", 0)
+                        .attr("class", "tooltip")
+                        .style("background-color", "#ffffff")
+                        .style("border", "solid")
+                        .style("border-width", "1px")
+                        .style("border-radius", "5px")
+                        .style("padding", "10px")
+                        .style("position", "absolute");
+
+  RadarPlot();
+
+
   function update_all(num, attr){
     // readdata
     d3.csv("All_Pokemon4.csv").then( function(data) {
+
+      data.forEach(function(d) {
+        d.HP = parseInt(d.HP);
+        d.Spa = parseInt(d.Spa);
+        d.Def = parseInt(d.Def);
+        d.Spd = parseInt(d.Spd);
+        d.Att = parseInt(d.Att);
+      });
+
+      var Max_HP = d3.max(data, function(d) { return d.HP; });
+      var Max_Spa = d3.max(data, function(d) { return d.Spa; });
+      var Max_Def = d3.max(data, function(d) { return d.Def; });
+      var Max_Spd = d3.max(data, function(d) { return d.Spd; });
+      var Max_Att = d3.max(data, function(d) { return d.Att; });
+
+        // A function that change this tooltip when the user hover a point.
+  // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+  const mouseover = function(event, d) {
+    tooltip
+      .style("opacity", 1)
+    
+      // Radar circle
+      const poke = [{
+        "Name": d.Name, 
+        "HP": d.HP/Max_HP, 
+        "Spa": d.Spa/Max_Spa, 
+        "Def": d.Def/Max_Def, 
+        "Spd": d.Spd/Max_Spd, 
+        "Att": d.Att/Max_Att }
+      ]
+    
+      var PokemonData = poke.map((i)=> {
+        // console.log(i)
+        // return {axis: i.HP, value: i.HP}
+        return [
+          {"tag name" : "HP", value : i.HP },
+          {"tag name" : "Spa", value : i.Spa  },
+          {"tag name" : "Def", value : i.Def },
+          {"tag name" : "Spd", value : i.Spd },
+          {"tag name" : "Att", value : i.Att },
+          {"tag name" : "HP", value : i.HP }
+        ]
+      });
+
+      d3.select(".container")
+        .style("opacity", 1)
+
+      const plots = d3.select(".container")
+        .append('g')
+        .selectAll('g')
+        .data(PokemonData)
+        .join('g')
+          .attr("data-name", "Name")
+          .attr("fill", "none")
+          .attr("stroke", "steelblue");
+
+        plots.append('path')
+          .attr("d", d => radarLine( d.map(v => v.value) ) )
+          .attr("fill", "#00A0B0")
+          .attr("fill-opacity", 0.1)
+          .attr("stroke", "#00A0B0")
+          .attr("stroke-width", 2);
+
+        // console.log(PokemonData.map( d => d.map (v => v.value )))
+
+
+        plots.selectAll("circle")
+          .data(d => d)
+          .join("circle")
+            .attr("r", dotRadius)
+            .attr("cx", (d,i) => rScale(d.value) * Math.cos(angleSlice*i - Math.PI/2))
+            .attr("cy", (d,i) => rScale(d.value) * Math.sin(angleSlice*i - Math.PI/2))
+            .style("fill-opacity", 0.8)
+        
+        if( imageExists('./images/'+d.Img+'.png') ){
+          var pokeimage = img.append('image')
+            .attr('class', 'pokeimage')
+            .attr('href', `./images/${d.Img}.png`)
+            .attr('width', 450)
+            .attr('height', 450);
+        }else{
+          var pokeimage = img.append('image')
+            .attr('class', 'pokeimage')
+            .attr('href', `./images/unfind.png`)
+            .attr('width', 450)
+            .attr('height', 450);
+        }
+
+
+
+        var pokeName = img.append('text')
+            .attr('class', 'pokeName')
+            .attr('x', 200)
+            .attr('y', 500)
+            .style('font-size', '28px')
+            .text(d.Name);
+        // console.log(imageExists('./images/'+d.Img+'.png'))
+  }
+
+
+  const mousemove = function(event, d) {
+    // console.log(d)
+    tooltip
+      .html(`${d.Name}`)
+      .style("left", (event.x)+20 + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+      .style("top", (event.y)+20 + "px")
+
+  }
+
+  // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+  const mouseleave = function(event,d) {
+    tooltip
+      .transition()
+      .duration(300)
+      .style("opacity", 0)
+    
+    svg_radar.select(".container")
+      .remove();
+
+    RadarPlot();
+
+    img.select(".pokeimage")
+      .remove();   
+    
+    img.select(".pokeName")
+      .remove();
+  }
+
       
       if(attr != 0 && num != 2){
         data = data.filter( d => (d.Type1 == attr || d.Type2 == attr) && d.FinalEvolution == num)
@@ -268,7 +510,10 @@
             .style("fill", "transparent")
             .style("fill", function (d) { 
               return "url(#"+d.pid+")"; 
-            });
+            })
+          .on("mouseover", mouseover )
+          .on("mousemove", mousemove )
+          .on("mouseleave", mouseleave );
 
         outter
           .attr("cx", d => d.x)
@@ -293,6 +538,9 @@
                 .attr("r", d => d.innerR)
                 .style("fill", d => d.Legendary=="1" ?"red":"white")
                 .style("stroke", "black")
+            .on("mouseover", mouseover )
+            .on("mousemove", mousemove )
+            .on("mouseleave", mouseleave )
         
           // left line                
           const left = scatter.selectAll("dot")
