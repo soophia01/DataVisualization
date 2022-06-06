@@ -4,42 +4,70 @@
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 
-<!-- Initialize a select button -->
-<label for="selectButton">please choose Final Evolution or not</label>
-<select id="selectButton"></select>
-<br>
-<!-- select attr -->
-<label for="attrselect">please choose the Type</label>
-<select id="attrselect"></select>
-<br>
+<style>
+  label{
+    font-size: 15px;
+  }
 
+  select{
+    font-size: 15px;
+  }
 
-<label for="Xaxis_change">please choose the Xaxis</label>
-<select id="Xaxis_change">
-  <option value="BMI">BMI</option>
-  <option value="Height">Height</option>
-  <option value="Weight">Weight</option>
-  <option value="Experience">Experience to level 100</option>
-  <option value="CatchRate" selected>CatchRate</option>
-</select>
-<br>
-<label for="Yaxis_change">please choose the Yaxis</label>
-<select id="Yaxis_change">
-  <option value="BMI">BMI</option>
-  <option value="Height">Height</option>
-  <option value="Weight">Weight</option>
-  <option value="Experience" selected>Experience to level 100</option>
-  <option value="CatchRate">CatchRate</option>
-</select>
+  .tick text{
+    font-size: 13px;
+  }
+</style>
 
-<!-- Create a div where the graph will take place -->
-<div id="my_dataviz"></div>
+  <!-- Initialize a select button -->
+<div class="row" style="margin-left: 10px; margin-top: 10px;">
+  <div class="col-sm-2">
+    <label for="selectButton">please choose Final Evolution or not</label>
+     <select class="form-select" id="selectButton"></select>
+     <br> 
+  </div>
+  <div class="col-sm-2">
+    <!-- select attr -->
+    <label for="attrselect">please choose the Type</label>
+    <select class="form-select" id="attrselect"></select>
+    <br>
+  </div>
+  <div class="col-sm-2">
+    <label for="Xaxis_change">please choose the Xaxis</label>
+    <select class="form-select" id="Xaxis_change">
+      <option value="BMI">BMI</option>
+      <option value="Height">Height</option>
+      <option value="Weight">Weight</option>
+      <option value="Experience">Experience to level 100</option>
+      <option value="CatchRate" selected>CatchRate</option>
+    </select>
+  </div>
+
+  <div class="col-sm-2">
+  <label for="Yaxis_change">please choose the Yaxis</label>
+  <select class="form-select" id="Yaxis_change">
+    <option value="BMI">BMI</option>
+    <option value="Height">Height</option>
+    <option value="Weight">Weight</option>
+    <option value="Experience" selected>Experience to level 100</option>
+    <option value="CatchRate">CatchRate</option>
+  </select> 
+  </div>
+</div>
+
+  <!-- Create a div where the graph will take place -->
+<div class="row">
+  <div id="my_dataviz" style="margin-left:10px"></div>
+</div>
+<!-- </div> -->
 
 <script>
 
   // set the dimensions and margins of the graph
-  const margin = {top: 10, right: 30, bottom: 30, left: 100},
+  const margin = {top: 10, right: 30, bottom: 50, left: 100},
           width = 1200 - margin.left - margin.right,
           height = 850 - margin.top - margin.bottom;
   const margin2 = {top: 10, right: 30, bottom: 30, left: 100},
@@ -69,15 +97,17 @@
       .attr("width", svgr_w + margin.top + margin.right)
       .attr("height", svgr_w + margin.top + margin.bottom)
       .style("position", "absolute")
-      .style("top", "10px")
+      .style("margin-top", "-50px")
       .append("g")
       .attr("transform", `translate(${svgr_margin.left}, ${svgr_margin.top})`);
   
   const img = d3.select("#my_dataviz")
       .append("svg")
+      .style("margin-top", "350px")
       .attr("width", svgr_w + margin.top + margin.right)
-      .attr("height", svgr_w + margin.top + margin.bottom)
-      .append("g");
+      .attr("height", svgr_w + margin.top + margin.bottom )
+      .append("g").
+      attr("transform", "translate(20, 0)");
   
   // Radar config ---------------------------------------
   const axisCircles = 5
@@ -117,7 +147,7 @@
     svg_radar.append('g')
       .attr("width", containerWidth)
       .attr("height", containerHeight)
-      .style("opacity", 1)
+      .style("opacity", 0)
       .attr("class", "container");
 
     var axisGrid = d3.select(".container")
@@ -211,6 +241,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
             "translate(" + (width/2) + " ," + 
                            (height + margin.top + 20) + ")")
       	.style("text-anchor", "middle")
+      	.attr("dy", "1em")
       	.text("Catch Rate");
 
   // text label for the y axis
@@ -354,21 +385,21 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
             .attr('class', 'pokeimage')
             .attr('href', `./images/${d.Img}.png`)
             .attr('width', 450)
-            .attr('height', 450);
+            .attr('height', 350)
         }else{
           var pokeimage = img.append('image')
             .attr('class', 'pokeimage')
             .attr('href', `./images/unfind.png`)
             .attr('width', 450)
-            .attr('height', 450);
+            .attr('height', 350);
         }
 
 
 
         var pokeName = img.append('text')
             .attr('class', 'pokeName')
-            .attr('x', 200)
-            .attr('y', 500)
+            .attr('x', 180)
+            .attr('y', 380)
             .style('font-size', '28px')
             .text(d.Name);
         // console.log(imageExists('./images/'+d.Img+'.png'))
