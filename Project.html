@@ -353,11 +353,11 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
     d3.csv("All_Pokemon4.csv").then( function(data) {
 
       data.forEach(function(d) {
-        d.HP = parseInt(d.HP);
-        d.Spa = parseInt(d.Spa);
-        d.Def = parseInt(d.Def);
-        d.Spd = parseInt(d.Spd);
-        d.Att = parseInt(d.Att);
+        d.HP = parseFloat(d.HP);
+        d.Spa = parseFloat(d.Spa);
+        d.Def = parseFloat(d.Def);
+        d.Spd = parseFloat(d.Spd);
+        d.Att = parseFloat(d.Att);
       });
 
       var Max_HP = d3.max(data, function(d) { return d.HP; });
@@ -609,7 +609,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
             .data(data)
             .join("circle")
                 .attr("class", "innerCircle LegendaryDot")
-                .attr("cx", (d,i) => parseInt(data2[i].attr('cx')) - d.outterR + d.Att*0.1)
+                .attr("cx", (d,i) => parseFloat(data2[i].attr('cx')) - d.outterR + d.Att*0.1)
                 .attr("cy",(d, i) => data2[i].attr('cy')) 
                 .attr("r", d => d.innerR)
                 .style("fill", d => d.Legendary=="1" ?"red":"white")
@@ -623,8 +623,8 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
               .data(data)
               .join("line")
                   .attr("class", "attack")
-                  .attr("x1", (d,i) => parseInt(data2[i].attr('cx')) - parseInt(data2[i].attr('r')))
-                  .attr("x2", (d,i) => parseInt(data2[i].attr('cx')) - parseInt(data2[i].attr('r'))/4 + d.Att*0.1 - parseInt(data2[i].attr('r')))
+                  .attr("x1", (d,i) => parseFloat(data2[i].attr('cx')) - parseFloat(data2[i].attr('r')))
+                  .attr("x2", (d,i) => parseFloat(data2[i].attr('cx')) - parseFloat(data2[i].attr('r'))/4 + d.Att*0.1 - parseFloat(data2[i].attr('r')))
                   .attr("y1", (d,i) => data2[i].attr('cy') )
                   .attr("y2", (d,i) => data2[i].attr('cy') )
                   .style("stroke", "black")
@@ -633,8 +633,8 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
               .data(data)
               .join("line")
                   .attr("class", "def")
-                  .attr("x1", (d,i) => parseInt(data2[i].attr('cx')) + parseInt(data2[i].attr('r'))  - d.Def*0.1 + parseInt(data2[i].attr('r'))/4)
-                  .attr("x2", (d,i) => parseInt(data2[i].attr('cx')) + parseInt(data2[i].attr('r')))
+                  .attr("x1", (d,i) => parseFloat(data2[i].attr('cx')) + parseFloat(data2[i].attr('r'))  - d.Def*0.1 + parseFloat(data2[i].attr('r'))/4)
+                  .attr("x2", (d,i) => parseFloat(data2[i].attr('cx')) + parseFloat(data2[i].attr('r')))
                   .attr("y1", (d,i) =>  data2[i].attr('cy') )
                   .attr("y2", (d,i) => data2[i].attr('cy') )
                   .style("stroke", "black")
