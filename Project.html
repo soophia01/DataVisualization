@@ -10,20 +10,63 @@
 
 <style>
   label{
-    font-size: 15px;
+    font-size: 16.5px;
   }
 
   select{
-    font-size: 15px;
+    font-size: 16.5px;
   }
 
   .tick text{
     font-size: 13px;
   }
+
+  #start{
+    height: 960px;
+    background-image: url("background.jpg");
+  }
+
+  li{
+    line-height: 50px;
+  }
 </style>
 
+<div id="start">
+  
+  <div class="row justify-content-center align-items-center">
+    <div class="col-12 col-md-8 col-lg-6" style="margin-top: 150px;">
+
+      <h1 class="display-1 text-dark mb-4 text-center">
+        service manaul
+      </h1>
+
+      <!-- Heading -->
+      <h3 class="text-dark mb-4 ">
+        <ol>
+          <li>You can use this chart to visualize Pokémon data.</li>
+          <li>You can choose different options to watch the distribution of Pokémon balls change.</li>
+          <li>You can move the mouse over a Pokémon ball, observe its stats and view its pictures.</li>
+        </ol>
+      </h3>
+
+      <h4>
+        <div class="alert alert-warning" role="alert">
+          ⚠ Need to wait until line and legendary ball distribution is complete before choosing different options.
+        </div>
+      </h4>
+
+      <p class="text-center">
+        <a href="#my_dataviz" class="btn btn-lg btn-dark ">
+          Get Started!
+        </a>
+      </p>
+    </div>
+
+    
+  </div>
+</div>
   <!-- Initialize a select button -->
-<div class="row" style="margin-left: 10px; margin-top: 10px;">
+<div class="row" style="margin-left: 5px; margin-top: 10px;">
   <div class="col-sm-2">
     <label for="selectButton">please choose Final Evolution or not</label>
      <select class="form-select" id="selectButton"></select>
