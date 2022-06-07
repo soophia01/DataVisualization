@@ -36,7 +36,7 @@
 <div id="start">
   
   <div class="row justify-content-center align-items-center">
-    <div class="col-12 col-md-8 col-lg-6" style="margin-top: 150px;">
+    <div class="col-12 col-md-8 col-lg-6" style="margin-top: 200px;">
 
       <h1 class="display-1 text-dark mb-4 text-center">
         service manual
@@ -62,7 +62,7 @@
   </div>
 </div>
   <!-- Initialize a select button -->
-<div class="row" style="margin-left: 5px; margin-top: 10px;">
+<div class="row" style="margin-left: 1.5px; margin-top: 10px;">
   <div class="col-sm-2">
     <label for="selectButton">please choose Final Evolution or not</label>
      <select disabled class="form-select" id="selectButton"></select>
@@ -73,6 +73,23 @@
     <label for="attrselect">please choose the Type</label>
     <select disabled class="form-select" id="attrselect"></select>
     <br>
+  </div>
+  <div class="col-sm-2">
+    <!-- select attr -->
+    <label for="attr2select">please choose the Type2</label>
+    <select disabled class="form-select" id="attr2select">
+      <option value="none" selected>none</option>
+    </select>
+    <br>
+  </div>
+  <div class="col-sm-2">
+    <label for="LegendarySelect">please choose Legendary or not</label>
+     <select disabled class="form-select" id="LegendarySelect">
+       <option value="1">Legendary</option>
+       <option value="0">not Legendary</option>
+       <option value="2" selected>ALL</option>
+     </select>
+     <br> 
   </div>
   <div class="col-sm-2">
     <label for="Xaxis_change">please choose the Xaxis</label>
@@ -268,6 +285,14 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
     .text(function (d) { return d; }) // text showed in the menu
     .attr("value", function (d) { return d; }) // corresponding value returned by the button
 
+    d3.select("#attr2select")
+    .selectAll('myOptions')
+    .data(attr)
+      .enter()
+      .append('option')
+    .text(function (d) { return d; }) // text showed in the menu
+    .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
   // Add X axis
   var x = d3.scaleLinear()
       .domain([0, 260])
@@ -306,24 +331,24 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
       	.text("Experience to level 100"); 
         
   const color =[
-        {"type":"Bug", "color":"#89a80d"},
-        {"type":"Dark", "color":"#5e4131D"},
-        {"type":"Dragon", "color":"#FF4D00"},
-        {"type":"Electric", "color":"#006374"},
-        {"type":"Fairy", "color":"#ff7f9d"},
-        {"type":"Fighting", "color":"#32CD32"},
-        {"type":"Fire", "color":"#FF2400"},
-        {"type":"Flying", "color":"#30D5C8"},
-        {"type":"Ghost", "color":"#808080"},
-        {"type":"Grass", "color":"#385E0F"},
-        {"type":"Ground", "color":"#ebae5d"},
-        {"type":"Ice", "color":"#6495ED"},
-        {"type":"Normal", "color":"#a7ac6a"},
-        {"type":"Poison", "color":"#b552a2"},
-        {"type":"Psychic", "color":"#fc5478"},
-        {"type":"Rock", "color":"#4D1F00"},
-        {"type":"Steel", "color":"#a5a4c3"},
-        {"type":"Water", "color":"#5181f9"}
+        {"type":"Bug", "color":"#C2B275"},
+        {"type":"Dark", "color":"#896C5D"},
+        {"type":"Dragon", "color":"#8577E2"},
+        {"type":"Electric", "color":"#FFD350"},
+        {"type":"Fairy", "color":"#E9A4E9"},
+        {"type":"Fighting", "color":"#B9695B"},
+        {"type":"Fire", "color":"#FF6144"},
+        {"type":"Flying", "color":"#96A5FF"},
+        {"type":"Ghost", "color":"#7373C1"},
+        {"type":"Grass", "color":"#8BD46E"},
+        {"type":"Ground", "color":"#C8AF65"},
+        {"type":"Ice", "color":"#7DD4FF"},
+        {"type":"Normal", "color":"#B6B6A8"},
+        {"type":"Poison", "color":"#B66FA8"},
+        {"type":"Psychic", "color":"#F0679E"},
+        {"type":"Rock", "color":"#C5B77D"},
+        {"type":"Steel", "color":"#B5B5C4"},
+        {"type":"Water", "color":"#52A9FF"}
       ]
   const max_val = [
       {"attr":"CathRate", "value" : 260},
@@ -354,7 +379,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
   RadarPlot();
 
 
-  function update_all(num, attr){
+  function update_all(num, attr, legend, attr2){
     // readdata
     d3.csv("Original.csv").then( function(data) {
 
@@ -458,11 +483,16 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
 
 
   const mousemove = function(event, d) {
-    // console.log(d)
+    let text = ''
+    if(d.Type2 == ''){
+      text =  `${d.Name}`+"<br>"+ `${d.Type1}`
+    }else{
+      text = `${d.Name}`+"<br>"+ `${d.Type1}`+", " +`${d.Type2}`
+    }
     tooltip
-      .html(`${d.Name}`)
+      .html(text)
       .style("left", (event.x)+20 + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
-      .style("top", (event.y)+20 + "px")
+      .style("top", (event.layerY)+20 + "px")
 
   }
 
@@ -486,15 +516,20 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
   }
 
       
-      if(attr != 0 && num != 2){
-        data = data.filter( d => (d.Type1 == attr || d.Type2 == attr) && d.FinalEvolution == num)
-      }else if(attr == 0 && num != 2){
-        data = data.filter( d => d.FinalEvolution == num )
-      } else if (attr == 0 && num == 2){
-        data = data
-      }else if(attr != 0 &&  num == 2){
-        console.log(attr)
-        data = data.filter( d => (d.Type1 == attr || d.Type2 == attr))
+      if(attr != 0){
+        data = data.filter(d => d.Type1 == attr)
+      }
+      if(num != 2){
+        data = data.filter(d => d.FinalEvolution == num)
+      }
+      if(legend != 2){
+        data = data.filter(d => d.Legendary == legend)
+      }
+      if(attr2 !="ALL" & attr2 != "none"){
+        data = data.filter(d => d.Type2 == attr2)
+      }
+      if(attr2 == "none"){
+        data = data.filter(d => d.Type2 == '')
       }
       
       xAxis.call(d3.axisBottom(x))
@@ -534,7 +569,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
           .data(data)
           .append("stop")
           .attr("offset", "0.5")
-          .attr("stop-opacity", "0.7")
+          .attr("stop-opacity", "0.8")
           .style("stop-color",  function (d) {  
             if(d.Type2 == ''){
               return d3.color("#FFFFFF")
@@ -553,7 +588,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
         .data(data)
         .append("stop")
         .attr("offset", "50%")
-        .attr("stop-opacity", "0.7")
+        .attr("stop-opacity", "0.8")
         // console.log( data.map(function(d) { return d.Type1}))
         .style("stop-color",  function (d) { 
           for(let i = 0 ; i < color.length ; i++){
@@ -654,7 +689,10 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
           }
 
           d3.selectAll("select").property("disabled", false)
-          
+
+          if(data.length == 0){
+            alert("There is no data!");
+          }
       }
 
       function changeRepulsion(isCheckboxChecked=1){
@@ -806,7 +844,7 @@ function drawcolor(){
         .attr('height', size)
         .attr('x', 0)
         .attr('y', i*(size+5))
-        .style("opacity",0.7)
+        .style("opacity",0.8)
         .attr('fill', d.color);
     })
 
@@ -814,7 +852,7 @@ function drawcolor(){
       svg2
         .append('text')
         .attr('x', size*1.2)
-        .attr('y', i*(size+5) + (size/2))
+        .attr('y', i*(size+5) + (size/2) + 5)
         .text(d.type)
         .attr("text-anchor", "left")
         // .style("fill", d.color)
@@ -831,10 +869,10 @@ function del(){
 }
 
 // A function that update the chart
-function update(selectedGroup, attr_choose) {
+function update(selectedGroup, attr_choose, Legendary_choose, attr2) {
   if(attr_choose == "ALL") attr_choose = 0
     del()
-    update_all(selectedGroup, attr_choose)
+    update_all(selectedGroup, attr_choose,  Legendary_choose, attr2)
 }
 
 // When the button is changed, run the updateChart function
@@ -842,20 +880,45 @@ d3.select("#selectButton").on("change", function(event,d) {
   // recover the option that has been chosen
   const selectedattr = d3.select("#attrselect").property("value")
   const selectedOption = d3.select(this).property("value")
+  const selectedattr2 = d3.select("#attr2select").property("value")
+  const LegendaryOption = d3.select("#LegendarySelect").property("value")
+
   // run the updateChart function with this selected option
-  update(selectedOption, selectedattr)
+  update(selectedOption, selectedattr, LegendaryOption, selectedattr2)
 })
 
 d3.select("#attrselect").on("change", function(event, d) {
   // recover the option that has been chosen
   const selectedOption = d3.select("#selectButton").property("value")
+  const LegendaryOption = d3.select("#LegendarySelect").property("value")
+  const selectedattr2 = d3.select("#attr2select").property("value")
   const selectedattr = d3.select(this).property("value")
   // run the updateChart function with this selected option
-  update(selectedOption, selectedattr)
+  update(selectedOption, selectedattr, LegendaryOption, selectedattr2)
+})
+
+d3.select("#attr2select").on("change", function(event, d) {
+  // recover the option that has been chosen
+  const selectedOption = d3.select("#selectButton").property("value")
+  const LegendaryOption = d3.select("#LegendarySelect").property("value")
+  const selectedattr2 = d3.select(this).property("value")
+  const selectedattr = d3.select("#attrselect").property("value")
+  // run the updateChart function with this selected option
+  update(selectedOption, selectedattr, LegendaryOption, selectedattr2)
+})
+
+d3.select("#LegendarySelect").on("change", function(event, d) {
+  // recover the option that has been chosen
+  const selectedOption = d3.select("#selectButton").property("value")
+  const selectedattr = d3.select("#attrselect").property("value")
+  const selectedattr2 = d3.select("#attr2select").property("value")
+  const LegendaryOption = d3.select(this).property("value")
+  // run the updateChart function with this selected option
+  update(selectedOption, selectedattr, LegendaryOption, selectedattr2)
 })
 
 
-update_all(1, "Grass")
+update_all(1, "Grass", 2, "none")
 drawcolor()
 
 
