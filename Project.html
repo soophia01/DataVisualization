@@ -331,7 +331,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
       	.text("Experience to level 100"); 
         
   const color =[
-        {"type":"Bug", "color":"#C2B275"},
+        {"type":"Bug", "color":"#413C27"},
         {"type":"Dark", "color":"#896C5D"},
         {"type":"Dragon", "color":"#8577E2"},
         {"type":"Electric", "color":"#FFD350"},
@@ -339,14 +339,14 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
         {"type":"Fighting", "color":"#B9695B"},
         {"type":"Fire", "color":"#FF6144"},
         {"type":"Flying", "color":"#96A5FF"},
-        {"type":"Ghost", "color":"#7373C1"},
+        {"type":"Ghost", "color":"#454574"},
         {"type":"Grass", "color":"#8BD46E"},
         {"type":"Ground", "color":"#C8AF65"},
         {"type":"Ice", "color":"#7DD4FF"},
         {"type":"Normal", "color":"#B6B6A8"},
         {"type":"Poison", "color":"#B66FA8"},
         {"type":"Psychic", "color":"#F0679E"},
-        {"type":"Rock", "color":"#C5B77D"},
+        {"type":"Rock", "color":"#FFF8A1"},
         {"type":"Steel", "color":"#B5B5C4"},
         {"type":"Water", "color":"#52A9FF"}
       ]
@@ -489,6 +489,8 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
     }else{
       text = `${d.Name}`+"<br>"+ `${d.Type1}`+", " +`${d.Type2}`
     }
+
+    text += "<br>Att: " + `${d.Att}` + " Def: " + `${d.Def}`
     tooltip
       .html(text)
       .style("left", (event.x)+20 + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
@@ -569,7 +571,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
           .data(data)
           .append("stop")
           .attr("offset", "0.5")
-          .attr("stop-opacity", "0.8")
+          .attr("stop-opacity", "1")
           .style("stop-color",  function (d) {  
             if(d.Type2 == ''){
               return d3.color("#FFFFFF")
@@ -588,7 +590,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
         .data(data)
         .append("stop")
         .attr("offset", "50%")
-        .attr("stop-opacity", "0.8")
+        .attr("stop-opacity", "1")
         // console.log( data.map(function(d) { return d.Type1}))
         .style("stop-color",  function (d) { 
           for(let i = 0 ; i < color.length ; i++){
@@ -844,7 +846,7 @@ function drawcolor(){
         .attr('height', size)
         .attr('x', 0)
         .attr('y', i*(size+5))
-        .style("opacity",0.8)
+        .style("opacity",1)
         .attr('fill', d.color);
     })
 
