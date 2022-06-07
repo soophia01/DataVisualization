@@ -51,12 +51,6 @@
         </ol>
       </h3>
 
-      <h4>
-        <div class="alert alert-warning" role="alert">
-          ⚠ Please wait until the Pokémon ball is fully drawn before changing the options.
-        </div>
-      </h4>
-
       <p class="text-center">
         <a href="#my_dataviz" class="btn btn-lg btn-dark ">
           Get Started!
@@ -71,18 +65,24 @@
 <div class="row" style="margin-left: 5px; margin-top: 10px;">
   <div class="col-sm-2">
     <label for="selectButton">please choose Final Evolution or not</label>
-     <select class="form-select" id="selectButton"></select>
+     <select disabled class="form-select" id="selectButton"></select>
      <br> 
   </div>
   <div class="col-sm-2">
     <!-- select attr -->
     <label for="attrselect">please choose the Type</label>
-    <select class="form-select" id="attrselect"></select>
+    <select disabled class="form-select" id="attrselect"></select>
     <br>
   </div>
   <div class="col-sm-2">
     <label for="Xaxis_change">please choose the Xaxis</label>
-    <select class="form-select" id="Xaxis_change">
+    <select disabled class="form-select" id="Xaxis_change">
+      <option value="HP">HP</option>
+      <option value="Spa">Spa</option>
+      <option value="Spd">Spd</option>
+      <option value="Spe">Spe</option>
+      <option value="Att">Att</option>
+      <option value="Def">Def</option>
       <option value="BMI">BMI</option>
       <option value="Height">Height</option>
       <option value="Weight">Weight</option>
@@ -93,7 +93,13 @@
 
   <div class="col-sm-2">
   <label for="Yaxis_change">please choose the Yaxis</label>
-  <select class="form-select" id="Yaxis_change">
+  <select disabled class="form-select" id="Yaxis_change">
+    <option value="HP">HP</option>
+    <option value="Spa">Spa</option>
+    <option value="Spd">Spd</option>
+    <option value="Spe">Spe</option>
+    <option value="Att">Att</option>
+    <option value="Def">Def</option>
     <option value="BMI">BMI</option>
     <option value="Height">Height</option>
     <option value="Weight">Weight</option>
@@ -322,7 +328,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
   const max_val = [
       {"attr":"CathRate", "value" : 260},
       {"attr":"Height", "value" :25},
-      {"attr":"BMI", "value" : 99990},
+      {"attr":"BMI", "value" : 644},
       {"attr":"Weight", "value" : 1000},
       {"attr":"Experience", "value" : 1800000}
     ]
@@ -350,7 +356,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
 
   function update_all(num, attr){
     // readdata
-    d3.csv("All_Pokemon4.csv").then( function(data) {
+    d3.csv("Original.csv").then( function(data) {
 
       data.forEach(function(d) {
         d.HP = parseFloat(d.HP);
@@ -574,6 +580,7 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
       drawPlot(); // Draws scatterplot (points overlap as simulation is off)
       
       function drawPlot(){
+        d3.selectAll("select").property("disabled", true)
         const outter = scatter.selectAll("circle").data(data);
         // outer circle
         outter
@@ -645,6 +652,8 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
               focus.call(zoom.transform, transform_event);
             }
           }
+
+          d3.selectAll("select").property("disabled", false)
           
       }
 
@@ -737,16 +746,15 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
 				x_attr = d3.select("#Xaxis_change").property("value")
 
         let x_max = 0
-        max_val.map(function(k, v){
-          if (k.attr == x_attr) x_max = k.value
-        })
+        // max_val.map(function(k, v){
+        //   if (k.attr == x_attr) x_max = k.value
+        // })
 
-        if(x_max == 0) x_max = d3.max(data.map(function (d) { return d[x_attr]}))
+        if(x_max == 0) x_max = d3.max(data, d=> parseInt(d[x_attr]))
         
         d3.selectAll("#Xaxis").text(x_attr != "Experience" ? x_attr: "Experience to level 100")
-        
         x.domain( [0, x_max] )
-
+        xAxis.call(d3.axisBottom(x))
         call_circle()
         
       })
@@ -755,15 +763,16 @@ const allGroup = ["Final Evolution", "NOT Final Evoulution", "ALL"]
         y_attr = d3.select("#Yaxis_change").property("value")
 
         let y_max = 0
-        max_val.map(function(k, v){
-          if (k.attr == y_attr) y_max = k.value
-        })
+        // max_val.map(function(k, v){
+        //   if (k.attr == y_attr) y_max = k.value
+        // })
 
-        if(y_max == 0) y_max = d3.max(data.map(function (d) { return d[y_attr]}))
+        if(y_max == 0) y_max = d3.max(data, d=> parseInt(d[y_attr]))
         
         d3.selectAll("#Yaxis").text(y_attr != "Experience" ? y_attr: "Experience to level 100")
-        
-        y.domain( [0, y_max] )
+
+        y.domain( [0, y_max] )       
+        yAxis.call(d3.axisLeft(y))
 
         call_circle()
       })
