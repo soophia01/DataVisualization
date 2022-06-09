@@ -39,7 +39,7 @@
     <div class="col-12 col-md-8 col-lg-6" style="margin-top: 200px;">
 
       <h1 class="display-1 text-dark mb-4 text-center">
-        service manual
+        Introduction
       </h1>
 
       <!-- Heading -->
@@ -491,6 +491,7 @@ const allGroup = ["ALL", "Final Evolution", "NOT Final Evoulution", ]
     }
 
     text += "<br>Att: " + `${d.Att}` + " Def: " + `${d.Def}`
+    text += "<br>Catch Rate:" + `${d.CatchRate}` 
     tooltip
       .html(text)
       .style("left", (event.x)+20 + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
